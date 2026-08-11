@@ -1,0 +1,99 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+package control;
+
+import boundary.CustomerBoundary;
+import entity.Customer;
+import entity.UserRepository;
+import tarumtresorts.TARUMTResorts;
+import utility.Input;
+
+/**
+ *
+ * @author Liew Zheng Han
+ */public class CustomerControl {
+    private final UserRepository userRepository;
+    private final CustomerBoundary customerUI = new CustomerBoundary();
+    private Customer customer;
+    
+    public CustomerControl(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+    
+    public void start(Customer customer) {
+        this.customer = customer;
+        
+        while (true) {
+            switch (this.customerUI.getCustomerMenuChoice()) {
+                case 1 -> addReservation();
+                case 2 -> this.customerUI.showProfile(this.customer);
+                case 3 -> updateProfile();
+                case 4 -> {
+                    if (deleteAccount()) return;
+                }
+                case 5 -> {
+                    return;
+                }                    
+            }
+        }
+    }
+    
+    private void addReservation() {
+        
+    }
+    
+    private void updateProfile() {
+        while (true) {
+            
+            switch (this.customerUI.getUpdateProfileChoice()) {
+                case 1 -> {
+                    String name = this.customerUI.getName();
+                    this.customer.setName(name);
+                    TARUMTResorts.save();
+                    this.customerUI.nameUpdated();
+                }
+                case 2 -> {
+                    String email = this.customerUI.getEmail();
+                    if (!Input.isValidEmail(email)) this.customerUI.invalidEmail();
+                    else if (userRepository.userExists(email)) this.customerUI.emailTaken();
+                    else {
+                        this.userRepository.updateCustomerEmail(this.customer, email);
+                        TARUMTResorts.save();
+                        this.customerUI.emailUpdated();
+                    }
+
+                }
+                case 3 -> {
+                    String phoneNumber = this.customerUI.getPhoneNumber();
+                    try {
+                        Integer.valueOf(phoneNumber);
+                        this.customer.setPhoneNumber(phoneNumber);
+                        TARUMTResorts.save();
+                        this.customerUI.phoneNumberUpdated();
+                    } catch (NumberFormatException e) {
+                        this.customerUI.invalidPhoneNumber();
+                    }
+                }
+                case 4 -> {
+                    String paymentMethod = this.customerUI.getPaymentMethod();
+                    this.customer.setPaymentMethod(paymentMethod);
+                    TARUMTResorts.save();
+                    this.customerUI.paymentMethodUpdated();
+                }
+                case 5 -> {
+                    return;
+                }
+            }
+        }
+    }
+    
+    private boolean deleteAccount() {
+        if (!this.customerUI.confirmDeleteAccount()) return false;
+        
+        this.userRepository.removeUser(this.customer);
+        this.customerUI.deleteSuccess();
+        return true;
+    }
+}

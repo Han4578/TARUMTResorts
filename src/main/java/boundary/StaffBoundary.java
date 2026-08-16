@@ -16,7 +16,7 @@ public class StaffBoundary {
         return Input.getIntInput(
                 """
                 1. Manage Guests                
-                2. Assign Rooms
+                2. Manage Rooms
                 3. Manage Tiers
                 4. Housekeeping
                 5. Front Desk

@@ -4,6 +4,9 @@
  */
 package entity;
 
+import adt.SortedArrayList;
+import adt.SortedListInterface;
+
 /**
  *
  * @author Liew Zheng Han
@@ -11,12 +14,14 @@ package entity;
 public class Customer extends Account {
     private String phoneNumber = "";
     private String paymentMethod = "";
-    private int tierId;
+    private Tier tier;
+    private boolean deactivated = false;
+    SortedListInterface<Reservation> reservations = new SortedArrayList<>();
     
-    public Customer(String email, String password, int tierId) {
+    public Customer(String email, String password, Tier tier) {
         super(email, password);
         this.name = "New Guest";
-        this.tierId = tierId;
+        this.tier = tier;
     }
     
     public String getPhoneNumber() {
@@ -36,11 +41,23 @@ public class Customer extends Account {
     }    
     
     public int getTierId() {
-        return this.tierId;
+        return this.tier.getTierId();
     }
     
-    public void setTier(int tierId) {
-        this.tierId = tierId;
+    public Tier getTier() {
+        return this.tier;
+    }
+    
+    public void deactivate() {
+        this.deactivated = true;
+    }
+    
+    public boolean isDeactivated() {
+        return this.deactivated;
+    }
+    
+    public void setTier(Tier tier) {
+        this.tier = tier;
     }    
 
     @Override

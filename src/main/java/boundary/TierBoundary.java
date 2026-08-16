@@ -5,8 +5,13 @@
 package boundary;
 
 import adt.SortedListInterface;
+import control.TierControl;
 import entity.Tier;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import utility.Input;
+import utility.Util;
 
 /**
  *
@@ -32,8 +37,8 @@ public class TierBoundary {
         
         System.out.println("%-6s %-10s %-8s".formatted("No.", "Name", "Priority"));
         for (int i = 0; i < tiers.size(); ++i) {
-            Tier tier = tiers.get(i);
-            System.out.println("%-6s %-10s %-8s".formatted("" + (i + 1), tier.getName(), tier.getPriority()));
+            Tier tier = tiers.get(i);            
+            System.out.println("%-6s %-10s %-8s".formatted("" + (i + 1), Util.ellipsis(tier.getName(), 10), tier.getPriority()));
         }
     }
     
@@ -93,5 +98,99 @@ public class TierBoundary {
 
     public void cannotDeleteDefaultTier() {
         System.out.println("Default tier cannot be deleted");
+    }
+
+    public LocalDate getStartDate() {
+        while (true) {
+            try {
+                String date = Input.getStringInput("Enter start date (dd/mm/yyyy, optional): ");
+                if (date.isBlank()) return LocalDate.MIN;
+                
+                DateTimeFormatter format = DateTimeFormatter.ofPattern("d/M/yyyy");
+                return LocalDate.parse(date, format);
+            } catch (DateTimeParseException e){}
+        }
+    }
+    
+    public LocalDate getEndDate() {
+        while (true) {
+            try {
+                String date = Input.getStringInput("Enter end date (dd/mm/yyyy, optional): ");
+                if (date.isBlank()) return LocalDate.MAX;
+                DateTimeFormatter format = DateTimeFormatter.ofPattern("d/M/yyyy");
+                return LocalDate.parse(date, format);
+            } catch (DateTimeParseException e){}
+        }
+    }
+
+    public void showAnnualReport(TierControl.ReportTier[] reportTiers, LocalDate startDate, LocalDate endDate) {
+        DateTimeFormatter format = DateTimeFormatter.ofPattern("dd MMM yyyy");
+        String range = "";
+        
+        if (!startDate.equals(LocalDate.MIN) && endDate.equals(LocalDate.MAX)) range = " From " + format.format(startDate);
+        else if (startDate.equals(LocalDate.MIN) && !endDate.equals(LocalDate.MAX)) range = " Until " + format.format(endDate);
+        else if (startDate.equals(LocalDate.MIN) && endDate.equals(LocalDate.MAX)) range = " " + format.format(startDate) + " - " + format.format(endDate);
+        
+        String title = "Annual Tier Reservation Report%s".formatted(range);
+        System.out.println(" ".repeat(25) + title);
+        
+        System.out.println("%-10s|%8s|%17s|%19s|%21s|%28s".formatted(
+                "Name", 
+                "Priority", 
+                "Reservation Count", 
+                "Total Reserved Days", 
+                "Average Days Per Room", 
+                "Average Days Per Reservation"
+        ));
+        
+        int reservationCount = 0;
+        int totalReservationDays = 0;
+        float averageDaysRoom = 0;
+        float averageDaysReservation = 0;
+        
+        for (TierControl.ReportTier reportTier: reportTiers) {            
+            System.out.println("%-10s|%8d|%17d|%19d|%21.02f|%28.02f".formatted(
+                    Util.ellipsis(reportTier.tier().getName(), 10), 
+                    reportTier.tier().getPriority(), 
+                    reportTier.reservationCount(), 
+                    reportTier.totalReservationDays(), 
+                    reportTier.averageDaysRoom(), 
+                    reportTier.averageDaysReservation()
+            ));
+            
+            reservationCount += reportTier.reservationCount();
+            totalReservationDays += reportTier.totalReservationDays();
+            averageDaysRoom += reportTier.averageDaysRoom();
+            averageDaysReservation += reportTier.averageDaysReservation();
+        }
+        
+        System.out.println("-".repeat(107));
+        
+        System.out.println("%-19s|%17d|%19d|%21.02f|%28.02f".formatted(
+            "Total",
+            reservationCount,
+            totalReservationDays,
+            averageDaysRoom,
+            averageDaysReservation
+        ));
+            }
+
+    public int getReportOption() {
+        return Input.getIntInput(
+                """
+                1. Sort by name              
+                2. Sort by priority              
+                3. Sort by reservation count                     
+                4. Sort by reserved days
+                5. Sort by average days per room         
+                6. Sort by average days per reservation 
+                7. Back
+                
+                Input: \
+                """, 1, 7);
+    }
+
+    public void invalidDateRange() {
+        System.out.println("Start date cannot be after end date");
     }
 }

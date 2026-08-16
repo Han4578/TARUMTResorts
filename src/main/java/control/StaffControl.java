@@ -12,15 +12,18 @@ import boundary.StaffBoundary;
  */
 public class StaffControl {
     private final TierControl tierControl;
+    private final RoomAssignControl roomAssignControl;
     private final StaffBoundary staffBoundary = new StaffBoundary();
     
-    public StaffControl(TierControl tierControl) {
+    public StaffControl(TierControl tierControl, RoomAssignControl roomAssignControl) {
         this.tierControl = tierControl;
+        this.roomAssignControl = roomAssignControl;
     }
     
     public void start() {
         while (true) {
             switch (this.staffBoundary.getMenuInput()) {
+                case 2 -> this.roomAssignControl.start();
                 case 3 -> this.tierControl.start();
                 case 6 -> { return; }
                 default -> {System.out.println("Not done yet");}

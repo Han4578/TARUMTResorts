@@ -4,6 +4,8 @@
  */
 package entity;
 
+import adt.ArrayList;
+import adt.ListInterface;
 import adt.SortedArrayList;
 import adt.SortedListInterface;
 import java.io.Serializable;
@@ -14,6 +16,7 @@ import java.io.Serializable;
  */
 public class UserRepository implements Serializable {
     private final SortedListInterface<Account> userList = new SortedArrayList<>();
+    private final ListInterface<Account> deactivatedUsers = new ArrayList<>();
     private final Account adminAccount = new Account("admin@admin.com", "password");
     
     public UserRepository() {
@@ -25,7 +28,8 @@ public class UserRepository implements Serializable {
     }
     
     public void removeUser(Account account) {
-        this.userList.remove(account);
+        this.deactivatedUsers.add(this.userList.remove(account));
+        if (account instanceof Customer customer) customer.deactivate();
     }
     
     public Account getUser(String email, String password) {
@@ -46,5 +50,9 @@ public class UserRepository implements Serializable {
         this.removeUser(customer);
         customer.setEmail(email);
         this.addUser(customer);
+    }
+    
+    public SortedListInterface<Account> getUserList() {
+        return this.userList;
     }
 }

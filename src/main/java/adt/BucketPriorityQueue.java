@@ -46,14 +46,13 @@ public class BucketPriorityQueue<T> implements PriorityQueueInterface<T>, Serial
     @Override
     public T pop() {
         int lowestPriority = this.containsItem.nextSetBit(0);
+        if (lowestPriority == -1) return null;
         Node nodeTail = this.buckets.get(lowestPriority);
-        
-        --this.numberOfItems;
         
         if (!nodeTail.hasNext()) { // Only 1 node in the circular linked list
             this.clear(lowestPriority);
             return nodeTail.getItem();
-        }
+        } else --this.numberOfItems;
         
         return nodeTail.removeNext(); // Remove head
     }
@@ -83,7 +82,8 @@ public class BucketPriorityQueue<T> implements PriorityQueueInterface<T>, Serial
         } else { // Merge based on nodeId as arrival time 
             this.mergePriority(priorityTo, this.buckets.get(priorityFrom));
         }
-        this.clear(priorityFrom);
+        this.buckets.set(priorityFrom, null);
+        this.containsItem.clear(priorityFrom);
     }
 
     @Override
@@ -136,7 +136,7 @@ public class BucketPriorityQueue<T> implements PriorityQueueInterface<T>, Serial
             fromTail.setNext(current.getNext());
             current.setNext(fromHead);
             current = fromTail;
-        } 
+        }
 
         current.removeNext(); // Remove blank node
 
@@ -163,7 +163,10 @@ public class BucketPriorityQueue<T> implements PriorityQueueInterface<T>, Serial
         
         Node node = this.buckets.get(priorityFrom);
         boolean val = this.containsItem.get(priorityFrom);
-        this.clear(priorityFrom);
+        
+        this.buckets.set(priorityFrom, null);
+        this.containsItem.clear(priorityFrom);
+        
         this.buckets.add(node, priorityTo);
         
         for (int i = this.containsItem.size() - 1; i >= priorityTo; --i) {
@@ -221,7 +224,8 @@ public class BucketPriorityQueue<T> implements PriorityQueueInterface<T>, Serial
             previous.removeNext();
             this.buckets.set(priority, previous);
         } else { // Previous is the blank head, no nodes left in priority
-            this.clear(priority);
+            this.buckets.set(priority, null);
+            this.containsItem.clear(priority);
         }
         
         if (!filteredTail.hasNext()) return null;
@@ -289,7 +293,7 @@ public class BucketPriorityQueue<T> implements PriorityQueueInterface<T>, Serial
     public boolean isEmpty(int priority) {
         if (priority < 0) throw new IllegalArgumentException("Priority cannot be less than 0");
         
-        return this.containsItem.get(priority);
+        return !this.containsItem.get(priority);
     }
 
     @Override
@@ -308,21 +312,21 @@ public class BucketPriorityQueue<T> implements PriorityQueueInterface<T>, Serial
         Node current;
         
         private CustomIterator() {
-            this.currentPriority = containsItem.nextSetBit(0);
-            this.current = buckets.get(this.currentPriority);
+            this.currentPriority = -1;
+            this.current = null;
             this.previous = null;
         }
 
         @Override
         public boolean hasNext() {
-            if (this.current.hasNext() && this.current.getNodeId() < this.current.getNext().getNodeId()) return true; // Same circular queue
+            if (this.current != null && this.current.hasNext() && this.current.getNodeId() < this.current.getNext().getNodeId()) return true; // Same circular queue
             return containsItem.nextSetBit(this.currentPriority + 1) != -1;
         }
 
         @Override
-        public Node next() {
+        public T next() {
             // If circular queue about to loop back to start, check next circular queue
-            if (!this.current.hasNext() || this.current.getNodeId() >= this.current.getNext().getNodeId()) {
+            if (this.current == null || this.current.getNodeId() >= this.current.getNext().getNodeId()) {
                 int nextPriority = containsItem.nextSetBit(this.currentPriority + 1);
                 if (nextPriority == -1) throw new NoSuchElementException();
                 
@@ -332,7 +336,7 @@ public class BucketPriorityQueue<T> implements PriorityQueueInterface<T>, Serial
             
             this.previous = this.current;
             this.current = this.current.getNext();
-            return this.current;
+            return this.current.getItem();
         }
 
         @Override
@@ -415,5 +419,12 @@ public class BucketPriorityQueue<T> implements PriorityQueueInterface<T>, Serial
         private boolean hasNext() {
             return this.next != null && this.next != this;
         }
+
+        @Override
+        public String toString() {
+            return "Node: " + this.nodeId;
+        }
+        
+        
     }
 }

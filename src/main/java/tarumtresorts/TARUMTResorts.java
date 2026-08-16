@@ -6,6 +6,7 @@ package tarumtresorts;
 
 import control.CustomerControl;
 import control.MainMenuControl;
+import control.RoomAssignControl;
 import control.StaffControl;
 import control.TierControl;
 import entity.RoomRepository;
@@ -28,12 +29,14 @@ public class TARUMTResorts {
     private static CustomerControl customerControl;
     private static StaffControl staffControl;
     private static TierControl tierControl;
+    private static RoomAssignControl roomAssignControl;
     
     public static void main(String[] args) {
         TARUMTResorts.load();
-        customerControl = new CustomerControl(userRepository);
-        tierControl = new TierControl(tierRepository);
-        staffControl = new StaffControl(tierControl);
+        customerControl = new CustomerControl(userRepository, tierRepository);
+        tierControl = new TierControl(tierRepository, roomRepository);
+        roomAssignControl = new RoomAssignControl(roomRepository, tierRepository);
+        staffControl = new StaffControl(tierControl, roomAssignControl);
         
         new MainMenuControl(userRepository, tierRepository, customerControl, staffControl).start();
     }
@@ -48,7 +51,7 @@ public class TARUMTResorts {
         } catch (Exception e) {
             System.out.println("File not found");
             userRepository = new UserRepository();
-            tierRepository = new TierRepository();
+            tierRepository = new TierRepository(userRepository);
             roomRepository = new RoomRepository();
         }
     }

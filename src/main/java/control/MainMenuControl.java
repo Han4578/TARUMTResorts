@@ -87,7 +87,7 @@ public class MainMenuControl {
             return;
         }
         
-        this.userRepository.addUser(new Customer(email, password, this.tierRepository.getDefaultTier().getTierId()));
+        this.userRepository.addUser(new Customer(email, password, this.tierRepository.getDefaultTier()));
         TARUMTResorts.save();
         this.mainMenuUI.signupStatus(true);
     }

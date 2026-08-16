@@ -10,8 +10,7 @@ import java.util.function.Predicate;
  *
  * @author Liew Zheng Han
  * @param <T>
- */
-public interface SortedListInterface<T> extends Iterable<T>{
+ */public interface SortedListInterface<T> extends Iterable<T>{
     public void add(T item);
     public T remove(int index);
     public T remove(T item);

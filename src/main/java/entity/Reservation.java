@@ -5,7 +5,7 @@
 package entity;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDate;
 
 /**
  *
@@ -13,10 +13,10 @@ import java.util.Date;
  */
 public class Reservation implements Serializable, Comparable<Reservation> {
     private Customer customer;
-    private Date startDate;
-    private Date endDate;
+    private LocalDate startDate;
+    private LocalDate endDate;
     
-    public Reservation(Customer customer, Date startDate, Date endDate) {
+    public Reservation(Customer customer, LocalDate startDate, LocalDate endDate) {
         this.customer = customer;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -30,19 +30,19 @@ public class Reservation implements Serializable, Comparable<Reservation> {
         this.customer = customer;
     }
     
-    public Date getStartDate() {
+    public LocalDate getStartDate() {
         return this.startDate;
     }
     
-    public void setStartDate(Date startDate) {
+    public void setStartDate(LocalDate startDate) {
         this.startDate = startDate;
     }
     
-    public Date getEndDate() {
+    public LocalDate getEndDate() {
         return this.endDate;
     }
     
-    public void setEndDate(Date endDate) {
+    public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
     }
 

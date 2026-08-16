@@ -20,8 +20,8 @@ public class ArrayList<T> implements ListInterface<T>, Serializable {
         this(8);
     }
     
-    public ArrayList(int initialSize) {
-        this.data = (T[]) new Object[Integer.max(initialSize, 1)];
+    public ArrayList(int initialCapacity) {
+        this.data = (T[]) new Object[Integer.max(initialCapacity, 1)];
     }
 
     @Override
@@ -138,15 +138,24 @@ public class ArrayList<T> implements ListInterface<T>, Serializable {
     
     private class CustomIterator implements Iterator {
         int index = 0;
+        boolean removed = true;
 
         @Override
         public boolean hasNext() {
-            return index >= lastIndex;
+            return index < lastIndex;
         }
 
         @Override
         public T next() {
+            removed = false;
             return data[index++];
+        }
+        
+        @Override
+        public void remove() {
+            if (removed) throw new IllegalStateException();
+            
+            ArrayList.this.remove(index - 1);
         }
     }
 }

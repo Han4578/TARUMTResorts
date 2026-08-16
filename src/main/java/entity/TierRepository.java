@@ -18,9 +18,11 @@ public class TierRepository implements Serializable {
     private final PriorityQueueInterface<Reservation> queue = new BucketPriorityQueue<>();
     private final SortedListInterface<Tier> tiers = new SortedArrayList<>();
     private final Tier defaultTier = new Tier("Regular", 0);
+    private final UserRepository userRepository;
     
-    public TierRepository() {
+    public TierRepository(UserRepository userRepository) {
         this.tiers.add(this.defaultTier);
+        this.userRepository = userRepository;
     }
     
     public SortedListInterface<Tier> getTiers() {
@@ -37,12 +39,12 @@ public class TierRepository implements Serializable {
         tier.setPriority(newPriority);
         this.tiers.add(tier);
         if (shiftPriority) { // All tiers >= newPriority += 1
-            this.queue.movePriority(currentPriority, newPriority, t -> t.getCustomer().getTierId() == tier.getTierId());
+            this.queue.movePriority(currentPriority, newPriority, t -> t.getCustomer().getTier().equals(tier));
 
             for (int i = this.tiers.binarySearch(tier); i < this.tiers.size(); ++i) {
                 this.tiers.get(i).setPriority(newPriority++);
             }
-        } else this.queue.mergePriority(currentPriority, newPriority, t -> t.getCustomer().getTierId() == tier.getTierId());
+        } else this.queue.mergePriority(currentPriority, newPriority, t -> t.getCustomer().getTier().equals(tier));
     }
     
     public boolean tierOccupied(int priority) {
@@ -71,6 +73,16 @@ public class TierRepository implements Serializable {
         
         this.tiers.remove(tier);
         // Move tier appointments to default tier
-        this.queue.movePriority(tier.getPriority(), this.defaultTier.getPriority(), appointment -> appointment.getCustomer().getTierId() == tier.getTierId());
+        this.queue.movePriority(tier.getPriority(), this.defaultTier.getPriority(), appointment -> appointment.getCustomer().getTier().equals(tier));
+        
+        for (Account account: this.userRepository.getUserList()) {
+            if (account instanceof Customer customer && customer.getTier().equals(tier)) {
+                customer.setTier(this.defaultTier);
+            }
+        }
+    }
+    
+    public PriorityQueueInterface<Reservation> getQueue() {
+        return this.queue;
     }
 }

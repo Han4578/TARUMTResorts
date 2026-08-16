@@ -7,6 +7,7 @@ package entity;
 import adt.SortedArrayList;
 import adt.SortedListInterface;
 import java.io.Serializable;
+import java.time.LocalDate;
 
 /**
  *
@@ -33,11 +34,15 @@ public class Room implements Serializable, Comparable<Room> {
     }
     
     public boolean canAssign(Reservation reservation) {
-        int index = this.reservations.binarySearch(r -> reservation.getStartDate().compareTo(r.getEndDate()) <= 0);
+        return this.canAssign(reservation.getStartDate(), reservation.getEndDate());
+    }
+    
+    public boolean canAssign(LocalDate startDate, LocalDate endDate) {
+        int index = this.reservations.binarySearch(r -> !startDate.isAfter(r.getEndDate()));
                 
         Reservation reservation2 = this.reservations.get(index);
 
-        return (reservation.getEndDate().compareTo(reservation2.getStartDate()) < 0);
+        return (endDate.isBefore(reservation2.getStartDate()));
     }
 
     void addReservation(Reservation reservation) {

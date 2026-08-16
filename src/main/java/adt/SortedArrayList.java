@@ -115,9 +115,7 @@ public class SortedArrayList<T extends Comparable<T>> implements SortedListInter
     @Override
     public int binarySearch(T item) {
         return this.binarySearch(item2 -> item.compareTo(item2) <= 0);
-    }
-    
-    
+    }    
 
     @Override
     public void clear() {

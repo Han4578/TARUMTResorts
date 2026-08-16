@@ -22,12 +22,12 @@ public class Account implements Comparable<Account>, Serializable {
     protected String password;
     
     public Account(String email) {
-        this.email = email;
+        this.email = email.toLowerCase();
         this.accountId = Account.lastAccountId++;
     }
     
     public Account(String email, String password) {
-        this.email = email;
+        this.email = email.toLowerCase();
         this.password = Account.hashPassword(password);
         this.accountId = Account.lastAccountId++;
     }
@@ -45,7 +45,7 @@ public class Account implements Comparable<Account>, Serializable {
     }
     
     public void setEmail(String email) {
-        this.email = email;
+        this.email = email.toLowerCase();
     }
     
     public String getPassword() {

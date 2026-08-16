@@ -6,6 +6,7 @@ package control;
 
 import boundary.CustomerBoundary;
 import entity.Customer;
+import entity.TierRepository;
 import entity.UserRepository;
 import tarumtresorts.TARUMTResorts;
 import utility.Input;
@@ -17,9 +18,11 @@ import utility.Input;
     private final UserRepository userRepository;
     private final CustomerBoundary customerUI = new CustomerBoundary();
     private Customer customer;
+    private final TierRepository tierRepository;
     
-    public CustomerControl(UserRepository userRepository) {
+    public CustomerControl(UserRepository userRepository, TierRepository tierRepository) {
         this.userRepository = userRepository;
+        this.tierRepository = tierRepository;
     }
     
     public void start(Customer customer) {
@@ -93,6 +96,8 @@ import utility.Input;
         if (!this.customerUI.confirmDeleteAccount()) return false;
         
         this.userRepository.removeUser(this.customer);
+        this.tierRepository.getQueue().clear(this.customer.getTier().getPriority(), r -> r.getCustomer().equals(this.customer));
+        TARUMTResorts.save();
         this.customerUI.deleteSuccess();
         return true;
     }

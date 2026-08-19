@@ -7,8 +7,8 @@ package control;
 import boundary.MainMenuBoundary;
 import entity.Account;
 import entity.Customer;
-import entity.TierRepository;
-import entity.UserRepository;
+import dao.TierRepository;
+import dao.UserRepository;
 import tarumtresorts.TARUMTResorts;
 import utility.Input;
 

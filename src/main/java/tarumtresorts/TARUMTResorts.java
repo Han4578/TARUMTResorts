@@ -4,17 +4,17 @@
 
 package tarumtresorts;
 
-import boundary.HousekeepingTaskUI;
 import control.CustomerControl;
+import control.HousekeepingTaskControl;
 import control.MainMenuControl;
 import control.RoomAssignControl;
 import control.StaffControl;
 import control.TierControl;
 import control.WalkInBookingControl;
-import entity.RoomRepository;
-import entity.TaskRepository;
-import entity.TierRepository;
-import entity.UserRepository;
+import dao.RoomRepository;
+import dao.TaskRepository;
+import dao.TierRepository;
+import dao.UserRepository;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
@@ -34,19 +34,19 @@ public class TARUMTResorts {
     private static StaffControl staffControl;
     private static TierControl tierControl;
     private static RoomAssignControl roomAssignControl;
-    
-    private static HousekeepingTaskUI housekeepingTaskUI;
+    private static HousekeepingTaskControl housekeepingTaskControl;
     private static WalkInBookingControl walkInBookingControl;
     
     public static void main(String[] args) {
         TARUMTResorts.load();
+        
         walkInBookingControl = new WalkInBookingControl(userRepository, roomRepository, tierRepository);
         tierControl = new TierControl(tierRepository, roomRepository);
         roomAssignControl = new RoomAssignControl(roomRepository, tierRepository);
-        housekeepingTaskUI = new HousekeepingTaskUI(roomRepository, taskRepository);
+        housekeepingTaskControl = new HousekeepingTaskControl(roomRepository, taskRepository);
         
         customerControl = new CustomerControl(userRepository, tierRepository, walkInBookingControl);
-        staffControl = new StaffControl(tierControl, roomAssignControl, housekeepingTaskUI, walkInBookingControl);
+        staffControl = new StaffControl(tierControl, roomAssignControl, housekeepingTaskControl, walkInBookingControl);
         
         new MainMenuControl(userRepository, tierRepository, customerControl, staffControl).start();
     }

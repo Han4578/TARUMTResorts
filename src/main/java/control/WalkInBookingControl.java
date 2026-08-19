@@ -6,14 +6,17 @@ package control;
 
 import adt.LinkedList;
 import adt.ListInterface;
+import boundary.WalkInBookingBoundary;
+import dao.RoomRepository;
+import dao.TierRepository;
+import dao.UserRepository;
 import entity.Customer;
 import entity.Reservation;
 import entity.Room;
-import entity.RoomRepository;
-import entity.TierRepository;
-import entity.UserRepository;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import tarumtresorts.TARUMTResorts;
+import utility.Input;
 
 /**
  *
@@ -22,17 +25,85 @@ import java.time.temporal.ChronoUnit;
 
 
 public class WalkInBookingControl {
-    
     private final UserRepository userRepository;
     private final RoomRepository roomRepository;
     private final TierRepository tierRepository;
     
     private final ListInterface<Reservation> walkInQueue = new LinkedList<>();
     
+    private final WalkInBookingBoundary walkInBookingBoundary = new WalkInBookingBoundary();
+    
     public WalkInBookingControl(UserRepository userRepository, RoomRepository roomRepository, TierRepository tierRepository) {
         this.userRepository = userRepository;
         this.roomRepository = roomRepository;
         this.tierRepository = tierRepository;
+    }
+    
+    // for customer to crud reservation
+    public void startCustomerFlow(Customer customer) {
+        while (true) {
+            this.walkInBookingBoundary.bookingStatus(this.getMyReservationStatus(customer.getEmail()));
+            
+            switch (this.walkInBookingBoundary.getCustomerChoice()) {
+                case 1 -> {
+                    int days = this.walkInBookingBoundary.getDaysStay();
+                    this.walkInBookingBoundary.systemMessage(this.registerWalkIn(customer, days));
+                    TARUMTResorts.save();
+                }
+                case 2 -> {
+                    if (this.getMyReservationStatus(customer.getEmail()).contains("do not have")) {
+                        this.walkInBookingBoundary.noReservation("update");
+                        break;
+                    }
+                    int days = this.walkInBookingBoundary.getNewDaysStay();
+                    this.walkInBookingBoundary.systemMessage(this.updateStayDays(customer.getEmail(), days));
+                    TARUMTResorts.save();
+                }
+                case 3 -> {
+                    if (this.getMyReservationStatus(customer.getEmail()).contains("do not have")) {
+                        this.walkInBookingBoundary.noReservation("cancel");
+                        break;
+                    }
+                    this.walkInBookingBoundary.systemMessage(this.cancelWalkInReservation(customer));
+                    TARUMTResorts.save();
+                }
+                case 4 -> {
+                    return; 
+                }
+            }
+        }
+    }
+    
+    // staff/front desk menu
+    public void startStaffFlow() {
+        while (true) {
+            int choice = Input.getIntInput(
+                    """
+                    
+                    --- Manage Walk-in Queue ---
+                    1. Process Next Guest in Queue
+                    2. Generate Waitlist Report
+                    3. Back
+                    
+                    Input: \
+                    """, 1, 3);
+            
+            switch (choice) {
+                case 1 -> {
+                    this.walkInBookingBoundary.processingQueueTitle();
+                    this.walkInBookingBoundary.systemMessage(this.processNextInQueue());
+                    TARUMTResorts.save();
+                }
+                case 2 -> {
+                    int sortChoice = this.walkInBookingBoundary.getSortChoice();
+                        
+                    this.walkInBookingBoundary.showReport(this.generateWaitlistReport(sortChoice));
+                }
+                case 3 -> {
+                    return;
+                }
+            }
+        }
     }
     
 

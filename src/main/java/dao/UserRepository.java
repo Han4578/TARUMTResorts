@@ -2,12 +2,14 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package entity;
+package dao;
 
 import adt.ArrayList;
 import adt.DoubleHashingTable;
 import adt.ListInterface;
 import adt.TableInterface;
+import entity.Account;
+import entity.Customer;
 import java.io.Serializable;
 
 /**

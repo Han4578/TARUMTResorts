@@ -4,9 +4,7 @@
  */
 package control;
 
-import boundary.HousekeepingTaskUI;
 import boundary.StaffBoundary;
-import boundary.WalkInBookingBoundary;
 
 /**
  *
@@ -17,22 +15,22 @@ public class StaffControl {
     private final RoomAssignControl roomAssignControl;
     private final StaffBoundary staffBoundary = new StaffBoundary();
     private final WalkInBookingControl walkInBookingControl;
-    private final HousekeepingTaskUI housekeepingTaskUI;
+    private final HousekeepingTaskControl housekeepingTaskControl;
     
-    public StaffControl(TierControl tierControl, RoomAssignControl roomAssignControl, HousekeepingTaskUI housekeepingTaskUI, WalkInBookingControl walkInBookingControl) {
+    public StaffControl(TierControl tierControl, RoomAssignControl roomAssignControl, HousekeepingTaskControl housekeepingTaskControl, WalkInBookingControl walkInBookingControl) {
         this.tierControl = tierControl;
         this.roomAssignControl = roomAssignControl;
         this.walkInBookingControl = walkInBookingControl;
-        this.housekeepingTaskUI = housekeepingTaskUI;
+        this.housekeepingTaskControl = housekeepingTaskControl;
     }
     
     public void start() {
         while (true) {
             switch (this.staffBoundary.getMenuInput()) {
-                case 1 -> new WalkInBookingBoundary(this.walkInBookingControl).startStaffFlow();
+                case 1 -> this.walkInBookingControl.startStaffFlow();
                 case 2 -> this.roomAssignControl.start();
                 case 3 -> this.tierControl.start();
-                case 4 -> this.housekeepingTaskUI.start();
+                case 4 -> this.housekeepingTaskControl.start();
                 case 6 -> { return; }
                 default -> {System.out.println("Not done yet");}
             }

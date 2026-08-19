@@ -3,10 +3,11 @@ package control;
 import adt.ArrayStack;
 import adt.SortedListInterface;
 import adt.StackInterface;
+import boundary.HousekeepingTaskBoundary;
+import dao.RoomRepository;
+import dao.TaskRepository;
 import entity.Room;
-import entity.RoomRepository;
 import entity.TaskLog;
-import entity.TaskRepository;
 import tarumtresorts.TARUMTResorts;
 
 /**
@@ -15,17 +16,78 @@ import tarumtresorts.TARUMTResorts;
  */
 
 public class HousekeepingTaskControl {
-
     private StackInterface<TaskLog> taskStack;
     private SortedListInterface<Room> roomList;
     private int taskCounter;
     private final RoomRepository roomRepository;
+    private HousekeepingTaskBoundary housekeepingTaskBoundary = new HousekeepingTaskBoundary();
 
     public HousekeepingTaskControl(RoomRepository roomRepository, TaskRepository taskRepository) {
         taskStack = taskRepository.getTasks();
         taskCounter = 1;
         this.roomRepository = roomRepository;
         this.roomList = roomRepository.getRooms();
+    }
+    
+    public void start() {
+        while (true) {
+            switch (this.housekeepingTaskBoundary.displayMenu()) {
+                case 1 -> this.housekeepingTaskBoundary.viewRoomStatus(this.roomStatus());
+                case 2 -> this.housekeepingTaskBoundary.viewTasks(this.displayTaskHistory());
+                case 3 -> addTask();
+                case 4 -> this.housekeepingTaskBoundary.rollbackStatus(this.rollbackStatus());
+                case 5 -> generateReport();
+                case 6 -> {
+                    return;
+                }
+                default -> System.out.println("\nInvalid choice. Please try again.");
+            }
+        }
+    }
+    
+    private void addTask() {
+        while (true) {
+            String roomNumberStr = this.housekeepingTaskBoundary.getRoomNumber();
+            int roomNumber;
+
+            if (roomNumberStr.equalsIgnoreCase("X")) {
+                return;
+            }
+            
+            try {
+                roomNumber = Integer.parseInt(roomNumberStr);
+            } catch (NumberFormatException e) {
+                continue;
+            }
+
+            Room room = this.searchRoom(roomNumber);
+
+            if (room == null) {
+                this.housekeepingTaskBoundary.roomNotFound();
+                continue;
+            }
+
+            while (true) {
+                String choice = this.housekeepingTaskBoundary.getAddTaskChoice(room);
+
+                if (choice.equalsIgnoreCase("X")) {
+                    return;
+                }
+
+                String newStatus = this.housekeepingTaskBoundary.getStatus(choice);
+
+                if (newStatus == null) continue;
+
+                String staffName = this.housekeepingTaskBoundary.getStaffName();
+
+                if (this.updateRoomStatus(roomNumber, newStatus, staffName)) {
+                    this.housekeepingTaskBoundary.taskAddedSuccessfully(this.searchRoom(roomNumber));
+                    break;
+                }
+
+                this.housekeepingTaskBoundary.invalidStatusChange();
+            }
+        }
     }
 
     // Update room cleaning status
@@ -101,6 +163,30 @@ public class HousekeepingTaskControl {
             return true;
         }
         return false;
+    }
+    
+    private void generateReport() {
+        while (true) {
+            switch (this.housekeepingTaskBoundary.getReportChoice()) {
+                case "1" -> {
+                    this.housekeepingTaskBoundary.showReport(this.generateTaskLogReport());
+                }
+
+                case "2" -> {
+                    this.housekeepingTaskBoundary.showReport(this.generateWorkloadReport());
+                }
+
+                case "3" -> {
+                    this.housekeepingTaskBoundary.showReport(this.generateStaffTaskReport(this.housekeepingTaskBoundary.getStaffName()));
+                }
+
+                case "X", "x" -> {
+                    return;
+                }
+                
+                default -> this.housekeepingTaskBoundary.invalidChoice();
+            }
+        }
     }
 
     // Generate task ID automatically

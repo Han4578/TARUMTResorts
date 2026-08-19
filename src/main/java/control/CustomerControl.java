@@ -5,10 +5,9 @@
 package control;
 
 import boundary.CustomerBoundary;
-import boundary.WalkInBookingBoundary;
 import entity.Customer;
-import entity.TierRepository;
-import entity.UserRepository;
+import dao.TierRepository;
+import dao.UserRepository;
 import tarumtresorts.TARUMTResorts;
 import utility.Input;
 
@@ -34,7 +33,7 @@ public class CustomerControl {
         
         while (true) {
             switch (this.customerUI.getCustomerMenuChoice()) {
-                case 1 -> new WalkInBookingBoundary(this.walkInBookingControl).startCustomerFlow(this.customer);
+                case 1 -> this.walkInBookingControl.startCustomerFlow(this.customer);
                 case 2 -> this.customerUI.showProfile(this.customer);
                 case 3 -> updateProfile();
                 case 4 -> {

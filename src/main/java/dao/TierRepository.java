@@ -2,12 +2,16 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package entity;
+package dao;
 
 import adt.BucketPriorityQueue;
 import adt.PriorityQueueInterface;
 import adt.SortedArrayList;
 import adt.SortedListInterface;
+import entity.Account;
+import entity.Customer;
+import entity.Reservation;
+import entity.Tier;
 import java.io.Serializable;
 
 /**

@@ -74,9 +74,9 @@ public class BucketPriorityQueue<T> implements PriorityQueueInterface<T>, Serial
     public void mergePriority(int priorityFrom, int priorityTo) {
         if (priorityFrom < 0 || priorityTo < 0) throw new IllegalArgumentException("Priority cannot be less than 0");
         
-        if (!this.containsItem.get(priorityFrom)) return; // Nothing to merge
+        if (this.isEmpty(priorityFrom)) return; // Nothing to merge
         
-        if (!this.containsItem.get(priorityTo)) { // Just move, no need to merge
+        if (this.isEmpty(priorityTo)) { // Just move, no need to merge
             this.containsItem.set(priorityTo);
             this.buckets.set(priorityTo, this.buckets.get(priorityFrom));
         } else { // Merge based on nodeId as arrival time 
@@ -90,13 +90,13 @@ public class BucketPriorityQueue<T> implements PriorityQueueInterface<T>, Serial
     public void mergePriority(int priorityFrom, int priorityTo, Predicate<T> condition) {
         if (priorityFrom < 0 || priorityTo < 0) throw new IllegalArgumentException("Priority cannot be less than 0");
 
-        if (!this.containsItem.get(priorityFrom)) return; // Nothing to merge
+        if (this.isEmpty(priorityFrom)) return; // Nothing to merge
         
         Node filteredNodes = this.filterPriority(priorityFrom, condition);
         
         if (filteredNodes == null) return;
         
-        if (!this.containsItem.get(priorityTo)) { // Just move, no need to merge
+        if (this.isEmpty(priorityTo)) { // Just move, no need to merge
             this.containsItem.set(priorityTo);
             this.buckets.set(priorityTo, filteredNodes);
         } else { // Merge based on nodeId as arrival time
@@ -144,20 +144,6 @@ public class BucketPriorityQueue<T> implements PriorityQueueInterface<T>, Serial
     }
 
     @Override
-    public void swapPriority(int priorityA, int priorityB) {
-        if (priorityA < 0 || priorityB < 0) throw new IllegalArgumentException("Priority cannot be less than 0");
-
-        Node swap = this.buckets.get(priorityA);
-        
-        this.buckets.set(priorityA, this.buckets.get(priorityB));
-        this.buckets.set(priorityB, swap);
-        
-        boolean bit = this.containsItem.get(priorityB);
-        this.containsItem.set(priorityB, this.containsItem.get(priorityA));
-        this.containsItem.set(priorityA, bit);
-    }
-
-    @Override
     public void movePriority(int priorityFrom, int priorityTo) { //Doesn't merge, shifts everything back (inclduding null) for consistency
         if (priorityFrom < 0 || priorityTo < 0) throw new IllegalArgumentException("Priority cannot be less than 0");
         
@@ -194,7 +180,7 @@ public class BucketPriorityQueue<T> implements PriorityQueueInterface<T>, Serial
     private Node filterPriority(int priority, Predicate<T> condition) {
         if (priority < 0) throw new IllegalArgumentException("Priority cannot be less than 0");
         
-        if (!this.containsItem.get(priority)) return null;
+        if (this.isEmpty(priority)) return null;
         
         Node tail = this.buckets.get(priority);
         Node head = new Node(-1);
@@ -246,7 +232,7 @@ public class BucketPriorityQueue<T> implements PriorityQueueInterface<T>, Serial
     public void clear(int priority) {
         if (priority < 0) throw new IllegalArgumentException("Priority cannot be less than 0");
         
-        if (!this.containsItem.get(priority)) return;
+        if (this.isEmpty(priority)) return;
         
         this.containsItem.clear(priority);
         Node tailNode = this.buckets.get(priority);
@@ -265,7 +251,7 @@ public class BucketPriorityQueue<T> implements PriorityQueueInterface<T>, Serial
     public void clear(int priority, Predicate<T> condition) {
         if (priority < 0) throw new IllegalArgumentException("Priority cannot be less than 0");
         
-        if (!this.containsItem.get(priority)) return;
+        if (this.isEmpty(priority)) return;
         
         Node tailNode = this.filterPriority(priority, condition);
         
@@ -277,11 +263,6 @@ public class BucketPriorityQueue<T> implements PriorityQueueInterface<T>, Serial
         }
         
         --this.numberOfItems;
-    }
-
-    @Override
-    public int priorityCount() {
-        return this.containsItem.cardinality();
     }
 
     @Override
@@ -424,7 +405,5 @@ public class BucketPriorityQueue<T> implements PriorityQueueInterface<T>, Serial
         public String toString() {
             return "Node: " + this.nodeId;
         }
-        
-        
     }
 }

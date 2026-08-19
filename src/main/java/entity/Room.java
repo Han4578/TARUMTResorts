@@ -16,9 +16,15 @@ import java.time.LocalDate;
 public class Room implements Serializable, Comparable<Room> {
     private int roomNumber;
     private final SortedListInterface<Reservation> reservations = new SortedArrayList<>();
+    private String status;
     
     public Room(int roomNumber) {
+        this(roomNumber, "Ready for Check-In");
+    }
+    
+    public Room(int roomNumber, String status) {
         this.roomNumber = roomNumber;
+        this.status = status;
     }
     
     public int getRoomNumber() {
@@ -45,8 +51,21 @@ public class Room implements Serializable, Comparable<Room> {
         return (endDate.isBefore(reservation2.getStartDate()));
     }
 
-    void addReservation(Reservation reservation) {
+    public void addReservation(Reservation reservation) {
         this.reservations.add(reservation);
+    }
+    
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    @Override
+    public String toString() {
+        return "Room " + roomNumber + " | " + status;
     }
 
     @Override

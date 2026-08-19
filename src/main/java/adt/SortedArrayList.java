@@ -14,9 +14,7 @@ import java.util.function.Predicate;
  * @param <T>
  */
 public class SortedArrayList<T extends Comparable<T>> implements SortedListInterface<T>, Serializable {
-    private ListInterface<T> data;
-    
-    public SortedArrayList() {
+    private ListInterface<T> data;public SortedArrayList() {
         this(8);
     }
     

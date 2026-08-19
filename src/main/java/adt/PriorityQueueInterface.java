@@ -12,15 +12,13 @@ import java.util.function.Predicate;
  * @author Liew Zheng Han
  * @param <T>
  */
-public interface PriorityQueueInterface<T> extends Iterable<T>{
+public interface PriorityQueueInterface<T> extends Iterable<T> {
     public void insert(T item, int priority);
     public T pop();
     public T peek();
     public int size();
-    public int priorityCount();
     public void mergePriority(int priorityFrom, int priorityTo);
     public void mergePriority(int priorityFrom, int priorityTo, Predicate<T> condition);
-    public void swapPriority(int priorityA, int priorityB);
     public void movePriority(int priorityFrom, int priorityTo);
     public void movePriority(int priorityFrom, int priorityTo, Predicate<T> condition);
     public void clear();

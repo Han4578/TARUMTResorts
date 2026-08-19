@@ -9,7 +9,7 @@ package adt;
  * @author Liew Zheng Han
  * @param <T>
  */
-public interface ListInterface<T> extends Iterable<T>{
+public interface ListInterface<T> extends Iterable<T> {
     public void add(T item);
     public void add(T item, int index);
     public T remove(int index);

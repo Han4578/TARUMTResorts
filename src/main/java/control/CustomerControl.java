@@ -5,6 +5,7 @@
 package control;
 
 import boundary.CustomerBoundary;
+import boundary.WalkInBookingBoundary;
 import entity.Customer;
 import entity.TierRepository;
 import entity.UserRepository;
@@ -14,15 +15,18 @@ import utility.Input;
 /**
  *
  * @author Liew Zheng Han
- */public class CustomerControl {
+ */
+public class CustomerControl {
     private final UserRepository userRepository;
     private final CustomerBoundary customerUI = new CustomerBoundary();
+    private final WalkInBookingControl walkInBookingControl;
     private Customer customer;
     private final TierRepository tierRepository;
     
-    public CustomerControl(UserRepository userRepository, TierRepository tierRepository) {
+    public CustomerControl(UserRepository userRepository, TierRepository tierRepository, WalkInBookingControl walkInBookingControl) {
         this.userRepository = userRepository;
         this.tierRepository = tierRepository;
+        this.walkInBookingControl = walkInBookingControl;
     }
     
     public void start(Customer customer) {
@@ -30,7 +34,7 @@ import utility.Input;
         
         while (true) {
             switch (this.customerUI.getCustomerMenuChoice()) {
-                case 1 -> addReservation();
+                case 1 -> new WalkInBookingBoundary(this.walkInBookingControl).startCustomerFlow(this.customer);
                 case 2 -> this.customerUI.showProfile(this.customer);
                 case 3 -> updateProfile();
                 case 4 -> {
@@ -41,10 +45,6 @@ import utility.Input;
                 }                    
             }
         }
-    }
-    
-    private void addReservation() {
-        
     }
     
     private void updateProfile() {

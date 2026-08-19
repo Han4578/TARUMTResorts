@@ -75,7 +75,7 @@ public class TierRepository implements Serializable {
         // Move tier appointments to default tier
         this.queue.movePriority(tier.getPriority(), this.defaultTier.getPriority(), appointment -> appointment.getCustomer().getTier().equals(tier));
         
-        for (Account account: this.userRepository.getUserList()) {
+        for (Account account: this.userRepository.getUsers().getValues()) {
             if (account instanceof Customer customer && customer.getTier().equals(tier)) {
                 customer.setTier(this.defaultTier);
             }

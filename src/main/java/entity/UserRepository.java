@@ -5,9 +5,9 @@
 package entity;
 
 import adt.ArrayList;
+import adt.DoubleHashingTable;
 import adt.ListInterface;
-import adt.SortedArrayList;
-import adt.SortedListInterface;
+import adt.TableInterface;
 import java.io.Serializable;
 
 /**
@@ -15,44 +15,40 @@ import java.io.Serializable;
  * @author Liew Zheng Han
  */
 public class UserRepository implements Serializable {
-    private final SortedListInterface<Account> userList = new SortedArrayList<>();
+    private final TableInterface<String, Account> userTable = new DoubleHashingTable<>();
     private final ListInterface<Account> deactivatedUsers = new ArrayList<>();
     private final Account adminAccount = new Account("admin@admin.com", "password");
     
     public UserRepository() {
-        this.userList.add(this.adminAccount);
+        this.userTable.insert(this.adminAccount.getEmail(), this.adminAccount);
     }
     
     public void addUser(Account account) {
-        this.userList.add(account);
+        this.userTable.insert(account.getEmail(), account);
     }
     
     public void removeUser(Account account) {
-        this.deactivatedUsers.add(this.userList.remove(account));
+        this.deactivatedUsers.add(this.userTable.remove(account.getEmail()));
         if (account instanceof Customer customer) customer.deactivate();
     }
     
     public Account getUser(String email, String password) {
-        int index = this.userList.indexOf(new Account(email));
-        if (index == -1) return null;
-        Account account = this.userList.get(index);
-        
-        return (account.getEmail().equals(email) && account.getPassword().equals(Account.hashPassword(password)))? account: null;
+        Account account = this.userTable.get(email);
+                
+        return (account != null && account.getPassword().equals(Account.hashPassword(password)))? account: null;
     }
     
     public boolean userExists(String email) {
-        int index = this.userList.indexOf(new Account(email));
-        if (index == -1) return false;
-        return this.userList.get(index).getEmail().equals(email);
+        return this.userTable.containsKey(email);
     }
 
     public void updateCustomerEmail(Customer customer, String email) {
-        this.removeUser(customer);
+        this.userTable.remove(customer.getEmail());
         customer.setEmail(email);
         this.addUser(customer);
     }
     
-    public SortedListInterface<Account> getUserList() {
-        return this.userList;
+    public TableInterface<String, Account> getUsers() {
+        return this.userTable;
     }
 }

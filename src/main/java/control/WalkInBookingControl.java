@@ -4,6 +4,7 @@
  */
 package control;
 
+import adt.ArrayList;
 import adt.LinkedList;
 import adt.ListInterface;
 import boundary.WalkInBookingBoundary;
@@ -143,23 +144,13 @@ public class WalkInBookingControl {
             }
         }
         
-        LocalDate startDate = LocalDate.now();
+        LocalDate startDate = this.walkInBookingBoundary.getStartDate();
         LocalDate endDate = startDate.plusDays(stayDays);
         Reservation newReservation = new Reservation(customer, startDate, endDate);
         
-        if (roomRepository.checkAvailability(newReservation)) {
-            var rooms = roomRepository.getRooms();
-            for (Room room: rooms) {
-                if (room.canAssign(newReservation)) {
-                    room.getReservations().add(newReservation); 
-                    return "Success: Room " + room.getRoomNumber() + " assigned to " + customer.getName();
-                }
-            }
-        }
-        
         walkInQueue.add(newReservation);
         
-        return "Queue: No rooms available. " + customer.getName() + " has been added to the end of the walk-in line.";
+        return customer.getName() + " has been added to the end of the walk-in line. Please wait for the staff to process your request.";
     }
     
 
@@ -191,35 +182,30 @@ public class WalkInBookingControl {
             return "The waiting list is currently empty.";
         }
         
-        int bestIndex = -1;
-        Reservation bestReservation = null;
-        int highestPriority = Integer.MAX_VALUE;
+        Reservation reservation = walkInQueue.remove(0);
         
-        // find highest tier guest
-        for (int i = 0; i < walkInQueue.size(); i++) {
-            Reservation r = walkInQueue.get(i);
-            int currentPriority = r.getCustomer().getTier().getPriority();
-            
-            if (currentPriority < highestPriority) {
-                highestPriority = currentPriority;
-                bestReservation = r;
-                bestIndex = i;
+        // Add show reservation info and approve/reject here?
+        
+        if (tierRepository.getQueue().isEmpty() && roomRepository.checkAvailability(reservation)) {
+            ListInterface<Room> availableRooms = new ArrayList<>();
+                    
+            for (Room room: this.roomRepository.getRooms()) { // Let staff choose which room to assign
+                if (room.canAssign(reservation)) availableRooms.add(room);
             }
-        }
-        
-        if (roomRepository.checkAvailability(bestReservation)) {
-             var rooms = roomRepository.getRooms();
-             for (Room room: rooms) {
-                if (room.canAssign(bestReservation)) {
 
-                    walkInQueue.remove(bestIndex); 
-                    room.getReservations().add(bestReservation);
-                    return "Success: Room " + room.getRoomNumber() + " assigned to VIP guest " + bestReservation.getCustomer().getName();
-                }
+            if (!availableRooms.isEmpty()) {
+                int choice = this.walkInBookingBoundary.getAvailableRoomChoice(availableRooms);
+
+                if (choice == 0) return "Process cancelled";
+                Room room = availableRooms.get(choice - 1);
+
+                room.addReservation(reservation);
+                return "Success: Room " + room.getRoomNumber() +" assigned to " + reservation.getCustomer().getName();
             }
         }
         
-        return "Still no rooms available for our highest priority guest: " + bestReservation.getCustomer().getName() + ".";
+        tierRepository.getQueue().insert(reservation, reservation.getCustomer().getTier().getPriority());
+        return "Reservation for " + reservation.getCustomer().getEmail() + "has been moved to room allocation queue";
     }
     
     public String generateWaitlistReport(int sortOption) {

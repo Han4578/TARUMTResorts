@@ -65,10 +65,11 @@ public class RoomAssignBoundary {
     }
     
     public void showRooms(ListInterface<Room> rooms) {
-        System.out.println("No. Room Numbers");
+        System.out.println("No. Room Number Status");
         
         for (int i = 0; i < rooms.size(); i++) {
-            System.out.println("%-3s %d".formatted(i + 1, rooms.get(i).getRoomNumber()));
+            Room room = rooms.get(i);
+            System.out.println("%-3s %-11d %s".formatted(i + 1, room.getRoomNumber(), room.getStatus()));
         }
     }
     

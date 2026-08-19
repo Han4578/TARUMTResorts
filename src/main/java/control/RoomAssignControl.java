@@ -9,10 +9,10 @@ import adt.ListInterface;
 import adt.PriorityQueueInterface;
 import adt.SortedListInterface;
 import boundary.RoomAssignBoundary;
-import entity.Reservation;
-import entity.Room;
 import dao.RoomRepository;
 import dao.TierRepository;
+import entity.Reservation;
+import entity.Room;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.Iterator;
@@ -327,7 +327,7 @@ public class RoomAssignControl {
         } else this.roomAssignBoundary.noReservations();
     }
     
-    private boolean assignRoom(Reservation reservation) {
+    public boolean assignRoom(Reservation reservation) {
         ListInterface<Room> availableRooms = new ArrayList<>();
                     
         for (Room room: this.roomRepository.getRooms()) {

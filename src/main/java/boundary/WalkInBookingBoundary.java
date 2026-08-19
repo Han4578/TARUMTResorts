@@ -4,6 +4,11 @@
  */
 package boundary;
 
+import adt.ListInterface;
+import entity.Room;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import utility.Input;
 /**
  *
@@ -64,6 +69,28 @@ public class WalkInBookingBoundary {
         System.out.println("\nGenerating report...");
         System.out.println(report);
     }
+
+    public LocalDate getStartDate() {
+        while (true) {
+            try {
+                String date = Input.getStringInput("Enter end date (dd/mm/yyyy): ");
+                DateTimeFormatter format = DateTimeFormatter.ofPattern("d/M/yyyy");
+                return LocalDate.parse(date, format);
+            } catch (DateTimeParseException e){}
+        }
+    }
     
+    public void showRooms(ListInterface<Room> rooms) {
+        System.out.println("No. Room Number Status");
+        
+        for (int i = 0; i < rooms.size(); i++) {
+            Room room = rooms.get(i);
+            System.out.println("%-3s %-11d %s".formatted(i + 1, room.getRoomNumber(), room.getStatus()));
+        }
+    }
     
+    public int getAvailableRoomChoice(ListInterface<Room> rooms) {
+        this.showRooms(rooms);
+        return Input.getIntInput("\nChoose an available room, 0 to cancel [0-%d]: ".formatted(rooms.size()), 0, rooms.size());
+    }
 }

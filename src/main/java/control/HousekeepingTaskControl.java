@@ -1,9 +1,10 @@
 package control;
 
 import adt.ArrayStack;
+import adt.SortedListInterface;
 import adt.StackInterface;
-import adt.TableInterface;
 import entity.Room;
+import entity.RoomRepository;
 import entity.TaskLog;
 import entity.TaskRepository;
 import tarumtresorts.TARUMTResorts;
@@ -16,18 +17,20 @@ import tarumtresorts.TARUMTResorts;
 public class HousekeepingTaskControl {
 
     private StackInterface<TaskLog> taskStack;
-    private TableInterface<Integer, Room> roomTable;
+    private SortedListInterface<Room> roomList;
     private int taskCounter;
+    private final RoomRepository roomRepository;
 
-    public HousekeepingTaskControl(TableInterface<Integer, Room> roomTable, TaskRepository taskRepository) {
+    public HousekeepingTaskControl(RoomRepository roomRepository, TaskRepository taskRepository) {
         taskStack = taskRepository.getTasks();
-        this.roomTable = roomTable;
         taskCounter = 1;
+        this.roomRepository = roomRepository;
+        this.roomList = roomRepository.getRooms();
     }
 
     // Update room cleaning status
     public boolean updateRoomStatus(int roomNumber, String newStatus, String staffName) {
-        Room room = roomTable.get(roomNumber);
+        Room room = roomRepository.getRoom(roomNumber);
 
         if (room == null) {
             return false;
@@ -55,7 +58,7 @@ public class HousekeepingTaskControl {
     }
 
     public boolean isValidStatusChange(int roomNumber, String newStatus) {
-        Room room = roomTable.get(roomNumber);
+        Room room = this.roomRepository.getRoom(roomNumber);
 
         if (room == null) {
             return false;
@@ -125,7 +128,7 @@ public class HousekeepingTaskControl {
     }
 
     public Room searchRoom(int roomNumber) {
-        return roomTable.get(roomNumber);
+        return this.roomRepository.getRoom(roomNumber);
     }
 
     public String searchTaskLogs(int roomNumber) {
@@ -183,9 +186,7 @@ public class HousekeepingTaskControl {
         output += String.format("%-8s %-18s%n", "Room No", "Status");
         output += "------------------------------------\n";
 
-        for (int i = 1; i <= roomTable.keyCount(); i++) {
-            Room room = roomTable.get(i);
-
+        for (Room room: roomList) {
             output += String.format("%-8d %-18s%n",
                     room.getRoomNumber(),
                     room.getStatus());
@@ -204,8 +205,7 @@ public class HousekeepingTaskControl {
         output += String.format("%-8s %-18s%n", "Room No", "Current Status");
         output += "------------------------------------\n";
 
-        for (int i = 1; i <= roomTable.keyCount(); i++) {
-            Room room = roomTable.get(i);
+        for (Room room: roomList) {
             String status = room.getStatus();
 
             if (status.equals("Dirty")) {

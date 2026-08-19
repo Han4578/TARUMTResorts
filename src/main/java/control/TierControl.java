@@ -105,7 +105,7 @@ public class TierControl {
         int[] reservationCount = new int[tiers.size()];
         int[] reservationDaysTotal = new int[tiers.size()];
         
-        for (Room room: this.roomRepository.getRooms().getValues()) {
+        for (Room room: this.roomRepository.getRooms()) {
             SortedListInterface<Reservation> reservations = room.getReservations();
             
             for (int i = reservations.binarySearch(r -> !startDate.isAfter(r.getEndDate())); i < reservations.size(); ++i) {

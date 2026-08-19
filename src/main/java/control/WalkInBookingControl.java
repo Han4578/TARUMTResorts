@@ -78,7 +78,7 @@ public class WalkInBookingControl {
         
         if (roomRepository.checkAvailability(newReservation)) {
             var rooms = roomRepository.getRooms();
-            for (Room room: rooms.getValues()) {
+            for (Room room: rooms) {
                 if (room.canAssign(newReservation)) {
                     room.getReservations().add(newReservation); 
                     return "Success: Room " + room.getRoomNumber() + " assigned to " + customer.getName();
@@ -138,7 +138,7 @@ public class WalkInBookingControl {
         
         if (roomRepository.checkAvailability(bestReservation)) {
              var rooms = roomRepository.getRooms();
-             for (Room room: rooms.getValues()) {
+             for (Room room: rooms) {
                 if (room.canAssign(bestReservation)) {
 
                     walkInQueue.remove(bestIndex); 

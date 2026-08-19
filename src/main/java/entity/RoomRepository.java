@@ -4,8 +4,8 @@
  */
 package entity;
 
-import adt.DoubleHashingTable;
-import adt.TableInterface;
+import adt.SortedArrayList;
+import adt.SortedListInterface;
 import java.io.Serializable;
 
 /**
@@ -13,27 +13,29 @@ import java.io.Serializable;
  * @author Liew Zheng Han
  */
 public class RoomRepository implements Serializable {
-    private final TableInterface<Integer, Room> rooms = new DoubleHashingTable<>();
+    private final SortedListInterface<Room> rooms = new SortedArrayList<>();
     
     public RoomRepository() {
         for (int roomNumber = 101; roomNumber <= 110; ++roomNumber) {
-            this.rooms.insert(roomNumber, new Room(roomNumber));
+            this.rooms.add(new Room(roomNumber));
         }
     }
 
     public boolean checkAvailability(Reservation reservation) {
-        for (Room room: this.rooms.getValues()) {
+        for (Room room: this.rooms) {
             if (room.canAssign(reservation)) return true;
         }
         
         return false;
     }
 
-    public TableInterface<Integer, Room> getRooms() {
+    public SortedListInterface<Room> getRooms() {
         return this.rooms;
     }
 
     public Room getRoom(int roomNumber) {
-        return this.rooms.get(roomNumber);
+        int index = this.getRooms().binarySearch(r -> r.getRoomNumber() <= roomNumber);
+        if (index == this.rooms.size() || this.rooms.get(index).getRoomNumber() != roomNumber) return null;
+        return this.rooms.get(index);
     }
 }

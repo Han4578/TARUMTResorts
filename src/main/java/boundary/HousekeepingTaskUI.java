@@ -23,7 +23,7 @@ public class HousekeepingTaskUI {
 
     public HousekeepingTaskUI(RoomRepository roomRepository, TaskRepository taskRepository) {
 
-        this.control = new HousekeepingTaskControl(roomRepository.getRooms(), taskRepository);
+        this.control = new HousekeepingTaskControl(roomRepository, taskRepository);
         this.scanner = new Scanner(System.in);
     }
 

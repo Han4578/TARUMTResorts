@@ -308,7 +308,7 @@ public class RoomAssignControl {
         
         ListInterface<Room> availableRooms = new ArrayList<>();
         
-        for (Room room: this.roomRepository.getRooms().getValues()) {
+        for (Room room: this.roomRepository.getRooms()) {
             if (room.canAssign(minDate, maxDate)) availableRooms.add(room);
         }
         
@@ -330,7 +330,7 @@ public class RoomAssignControl {
     private boolean assignRoom(Reservation reservation) {
         ListInterface<Room> availableRooms = new ArrayList<>();
                     
-        for (Room room: this.roomRepository.getRooms().getValues()) {
+        for (Room room: this.roomRepository.getRooms()) {
             if (room.canAssign(reservation)) availableRooms.add(room);
         }
         
@@ -361,7 +361,7 @@ public class RoomAssignControl {
             months[i] = months[i - 1].plusMonths(1);
         }
         
-        for (Room room: this.roomRepository.getRooms().getValues()) {
+        for (Room room: this.roomRepository.getRooms()) {
             SortedListInterface<Reservation> reservations = room.getReservations();
             
             for (int i = reservations.binarySearch(r -> !months[0].isAfter(r.getEndDate())); i < reservations.size(); ++i) {
@@ -376,7 +376,7 @@ public class RoomAssignControl {
         }
         
         ReportMonth[] reportMonths = new ReportMonth[12];
-        int roomCount = this.roomRepository.getRooms().keyCount();
+        int roomCount = this.roomRepository.getRooms().size();
         
         for (int i = 0; i < 12; i++) {
             reportMonths[i] = new ReportMonth(months[i], reservationCount[i], reservationDaysTotal[i], (float) reservationDaysTotal[i] / roomCount, (float) reservationDaysTotal[i] / reservationCount[i]);

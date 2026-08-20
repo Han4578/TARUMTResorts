@@ -36,7 +36,7 @@ public class RoomRepository implements Serializable {
     }
 
     public Room getRoom(int roomNumber) {
-        int index = this.getRooms().binarySearch(r -> r.getRoomNumber() <= roomNumber);
+        int index = this.rooms.binarySearch(r -> roomNumber <= r.getRoomNumber());
         if (index == this.rooms.size() || this.rooms.get(index).getRoomNumber() != roomNumber) return null;
         return this.rooms.get(index);
     }

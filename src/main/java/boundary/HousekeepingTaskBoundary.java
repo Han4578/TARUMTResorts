@@ -1,6 +1,7 @@
 package boundary;
 
 import entity.Room;
+import entity.TaskLog;
 import utility.Input;
 
 /**
@@ -12,7 +13,7 @@ public class HousekeepingTaskBoundary {
     public int displayMenu() {
         return Input.getIntInput(
                 """
-            ========================================
+            =======================================
                   HOUSEKEEPING TASK MANAGEMENT
             =======================================
             1 View Room Status
@@ -123,5 +124,19 @@ public class HousekeepingTaskBoundary {
 
     public void invalidChoice() {
         System.out.println("Invalid choice.");    
+    }
+
+    public boolean confirmAddTask(TaskLog task) {
+        System.out.println(
+            """
+            ==========================
+            Room Number     : %d
+            Original Status : %s
+            New Status      : %s
+            Staff Name      : %s
+            ==========================
+            """.formatted(task.getRoom().getRoomNumber(), task.getPreviousStatus(), task.getCurrentStatus(), task.getStaffName()));
+        
+        return Input.getBooleanInput("Confirm Add Task? [y/n]: ");
     }
 }

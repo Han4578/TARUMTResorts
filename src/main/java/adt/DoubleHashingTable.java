@@ -283,7 +283,7 @@ public class DoubleHashingTable<K, V> implements TableInterface<K, V>, Serializa
     }
     
     
-    private class Entry<K, V> {
+    private class Entry<K, V> implements Serializable {
 
         private final K key;
         private final V value;

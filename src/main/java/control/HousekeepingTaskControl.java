@@ -67,31 +67,16 @@ public class HousekeepingTaskControl {
                 continue;
             }
 
-            while (true) {
-                String choice = this.housekeepingTaskBoundary.getAddTaskChoice(room);
+            String staffName = this.housekeepingTaskBoundary.getStaffName();
 
-                if (choice.equalsIgnoreCase("X")) {
-                    return;
-                }
-
-                String newStatus = this.housekeepingTaskBoundary.getStatus(choice);
-
-                if (newStatus == null) continue;
-
-                String staffName = this.housekeepingTaskBoundary.getStaffName();
-
-                if (this.updateRoomStatus(roomNumber, newStatus, staffName)) {
-                    this.housekeepingTaskBoundary.taskAddedSuccessfully(this.searchRoom(roomNumber));
-                    break;
-                }
-
-                this.housekeepingTaskBoundary.invalidStatusChange();
+            if (this.updateRoomStatus(roomNumber, staffName)) {
+                this.housekeepingTaskBoundary.taskAddedSuccessfully(this.searchRoom(roomNumber));
             }
         }
     }
 
     // Update room cleaning status
-    public boolean updateRoomStatus(int roomNumber, String newStatus, String staffName) {
+    public boolean updateRoomStatus(int roomNumber, String staffName) {
         Room room = roomRepository.getRoom(roomNumber);
 
         if (room == null) {
@@ -100,55 +85,31 @@ public class HousekeepingTaskControl {
 
         String previousStatus = room.getStatus();
 
-        if (!isValidStatusChange(roomNumber, newStatus)) {
-            return false;
-        }
+        String newStatus = switch(previousStatus.toLowerCase()) {
+            case "ready for check-in" -> "Dirty";
+            case "dirty" -> "Cleaning";
+            case "cleaning" -> "Inspected";
+            case "inspected" -> "Ready for Check-In";
+            default -> "ready for check-in";
+        };
 
         TaskLog task = new TaskLog(
-            generateTaskID(),
+            "",
             room,
             previousStatus,
             newStatus,
             staffName
         );
+        
+        if (!this.housekeepingTaskBoundary.confirmAddTask(task)) return false;
+        
+        task.setTaskID(this.generateTaskID());
 
         taskStack.push(task);
         room.setStatus(newStatus);
         TARUMTResorts.save();
 
         return true;
-    }
-
-    public boolean isValidStatusChange(int roomNumber, String newStatus) {
-        Room room = this.roomRepository.getRoom(roomNumber);
-
-        if (room == null) {
-            return false;
-        }
-
-        String currentStatus = room.getStatus();
-
-        if (currentStatus.equals("Dirty")
-                && newStatus.equals("Cleaning")) {
-            return true;
-        }
-
-        if (currentStatus.equals("Cleaning")
-                && newStatus.equals("Inspected")) {
-            return true;
-        }
-
-        if (currentStatus.equals("Inspected")
-                && newStatus.equals("Ready for Check-In")) {
-            return true;
-        }
-
-        if (currentStatus.equals("Ready for Check-In")
-                && newStatus.equals("Dirty")) {
-            return true;
-        }
-
-        return false;
     }
 
     // Rollback the latest status change

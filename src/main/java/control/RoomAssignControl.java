@@ -41,8 +41,8 @@ public class RoomAssignControl {
                 case 3 -> this.assignNextAvailable();
                 case 4 -> this.assignNextAvailableWithoutConflict();
                 case 5 -> this.unassignRoom();
-                case 6 -> this.viewRoomAvailability();
-                case 7 -> this.generateAnnualReport();
+                case 6 -> this.generateAnnualReport();
+                case 7 -> this.viewRoomAvailability();
                 case 8 -> { return; }
             }
         }
@@ -55,22 +55,20 @@ public class RoomAssignControl {
         
         for (Reservation reservation: queue) reservations.add(reservation);
         
-        this.roomAssignBoundary.showQueueHeader();
-        
-        for (int j = 0; j < 10 && index < reservations.size(); ++j) { // Show up to 10 reservations
-            this.roomAssignBoundary.showQueue(reservations.get(index), index + 1);
-            ++index;
-        }
-        
         while (true) {
+            if (index + 10 > reservations.size()) index = Integer.max(0, reservations.size() - 10);
+                
+            this.roomAssignBoundary.showQueueHeader();
+        
+            for (int j = 0; j < 10 && index < reservations.size(); ++j) { // Show up to 10 reservations
+                this.roomAssignBoundary.showQueue(reservations.get(index), index + 1);
+                ++index;
+            }
+
+            this.roomAssignBoundary.showQueueFooter();
+            
             switch (this.roomAssignBoundary.getQueueOptions()) {
                 case 1 -> { // Load more
-                    this.roomAssignBoundary.showQueueHeader();
-
-                    for (int j = 0; j < 10 && index < reservations.size(); ++j) { // Show next 10
-                        this.roomAssignBoundary.showQueue(reservations.get(index), index + 1);
-                        ++index;
-                    }
                 }
                 case 2 -> { // Filter by name
                     String name = this.roomAssignBoundary.getName().toLowerCase();
@@ -83,13 +81,6 @@ public class RoomAssignControl {
                     
                     reservations = filteredReservations;
                     index = 0;
-                    
-                    this.roomAssignBoundary.showQueueHeader();
-        
-                    for (int j = 0; j < 10 && index < reservations.size(); ++j) { // Show up to 10 reservations
-                        this.roomAssignBoundary.showQueue(reservations.get(index), index + 1);
-                        ++index;
-                    }
                 }
                 case 3 -> { // Filter by email
                     String email = this.roomAssignBoundary.getEmail().toLowerCase();
@@ -102,13 +93,6 @@ public class RoomAssignControl {
                     
                     reservations = filteredReservations;
                     index = 0;
-                    
-                    this.roomAssignBoundary.showQueueHeader();
-        
-                    for (int j = 0; j < 10 && index < reservations.size(); ++j) { // Show up to 10 reservations
-                        this.roomAssignBoundary.showQueue(reservations.get(index), index + 1);
-                        ++index;
-                    }
                 }
                 case 4 -> { // Filter by date range
                     LocalDate startDate = this.roomAssignBoundary.getStartDate();
@@ -129,13 +113,6 @@ public class RoomAssignControl {
                     
                     reservations = filteredReservations;
                     index = 0;
-                    
-                    this.roomAssignBoundary.showQueueHeader();
-        
-                    for (int j = 0; j < 10 && index < reservations.size(); ++j) { // Show up to 10 reservations
-                        this.roomAssignBoundary.showQueue(reservations.get(index), index + 1);
-                        ++index;
-                    }
                 }
                 case 5 -> { // Reset
                     reservations = new ArrayList<>(queue.size());
@@ -143,20 +120,13 @@ public class RoomAssignControl {
                     for (Reservation reservation: queue) reservations.add(reservation);
                     
                     index = 0;
-                    
-                    this.roomAssignBoundary.showQueueHeader();
-        
-                    for (int j = 0; j < 10 && index < reservations.size(); ++j) { // Show up to 10 reservations
-                        this.roomAssignBoundary.showQueue(reservations.get(index), index + 1);
-                        ++index;
-                    }
                 }
                 case 6 -> { // Select from list
                     if (index == 0) {
                         this.roomAssignBoundary.noReservations();
                         continue;
                     }
-                    Reservation chosen = reservations.get(this.roomAssignBoundary.selectFromList(index));
+                    Reservation chosen = reservations.get(this.roomAssignBoundary.selectFromList(index) - 1);
                     
                     if (this.reservationActions(chosen)) return;
                 }
@@ -179,6 +149,8 @@ public class RoomAssignControl {
         
     private boolean reservationActions(Reservation reservation) {
         while (true) {
+            this.roomAssignBoundary.showReservation(reservation);
+            
             switch (this.roomAssignBoundary.getReservationOption()) {
                 case 1 -> { // Assign room
                     if (this.assignRoom(reservation)) {
@@ -207,9 +179,9 @@ public class RoomAssignControl {
         while (iterator.hasNext()) {
             Reservation reservation = iterator.next();
             
-            this.roomAssignBoundary.showReservation(reservation);
-            
             if (this.roomRepository.checkAvailability(reservation)) {
+                this.roomAssignBoundary.showReservation(reservation);
+                
                 if (this.assignRoom(reservation)) {
                     iterator.remove();
                     TARUMTResorts.save();
@@ -286,9 +258,9 @@ public class RoomAssignControl {
         
         SortedListInterface<Reservation> reservations = room.getReservations();
         
-        int index = reservations.binarySearch(r -> !reservationDate.isAfter(r.getStartDate()));
-        
-        if (index == reservations.size() || reservations.get(index).getEndDate().isBefore(reservationDate)) {
+        int index = reservations.binarySearch(r -> !reservationDate.isAfter(r.getEndDate()));
+
+        if (index == reservations.size() || reservations.get(index).getStartDate().isAfter(reservationDate)) {
             this.roomAssignBoundary.reservationNotFound();
             return;
         }
@@ -319,7 +291,11 @@ public class RoomAssignControl {
         PriorityQueueInterface<Reservation> queue = this.tierRepository.getQueue();
         
         if (!queue.isEmpty()) {
-            if (this.assignRoom(queue.peek())) {
+            Reservation reservation = queue.peek();
+            
+            this.roomAssignBoundary.showReservation(reservation);
+            
+            if (this.assignRoom(reservation)) {
                 queue.pop();
                 TARUMTResorts.save();
                 this.roomAssignBoundary.roomAssignSuccess();
@@ -379,7 +355,7 @@ public class RoomAssignControl {
         int roomCount = this.roomRepository.getRooms().size();
         
         for (int i = 0; i < 12; i++) {
-            reportMonths[i] = new ReportMonth(months[i], reservationCount[i], reservationDaysTotal[i], (float) reservationDaysTotal[i] / roomCount, (float) reservationDaysTotal[i] / reservationCount[i]);
+            reportMonths[i] = new ReportMonth(months[i], reservationCount[i], reservationDaysTotal[i], (float) reservationDaysTotal[i] / roomCount, reservationCount[i] > 0? (float) reservationDaysTotal[i] / reservationCount[i]: 0);
         }
         
         boolean ascending = true;

@@ -4,9 +4,6 @@
  */
 package entity;
 
-import adt.SortedArrayList;
-import adt.SortedListInterface;
-
 /**
  *
  * @author Liew Zheng Han
@@ -16,7 +13,6 @@ public class Customer extends Account {
     private String paymentMethod = "";
     private Tier tier;
     private boolean deactivated = false;
-    SortedListInterface<Reservation> reservations = new SortedArrayList<>();
     
     public Customer(String email, String password, Tier tier) {
         super(email, password);

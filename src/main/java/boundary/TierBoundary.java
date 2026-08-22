@@ -21,12 +21,13 @@ public class TierBoundary {
     public int getMenuChoice() {
         return Input.getIntInput(
                 """
+                =====================
                 1. View Tiers
                 2. Add Tier
                 3. Edit Tier
                 4. Generate Report
                 5. Back
-                
+                =====================
                 Input: \
                 """, 1, 5
         );
@@ -35,11 +36,14 @@ public class TierBoundary {
     public void showTiers(SortedListInterface<Tier> tiers) {
         if (tiers.isEmpty()) System.out.println("No tiers added");
         
+        System.out.println("=".repeat(26));
         System.out.println("%-6s %-10s %-8s".formatted("No.", "Name", "Priority"));
+        System.out.println("=".repeat(26));
         for (int i = 0; i < tiers.size(); ++i) {
             Tier tier = tiers.get(i);            
             System.out.println("%-6s %-10s %-8s".formatted("" + (i + 1), Util.ellipsis(tier.getName(), 10), tier.getPriority()));
         }
+        System.out.println("=".repeat(26));
     }
     
     public String getName() {
@@ -67,25 +71,43 @@ public class TierBoundary {
     }
 
     public void tierAdded() {
-        System.out.println("Tier added");
+        System.out.println(
+                """
+                ===========
+                Tier added
+                ===========
+                """);
     }
 
     public int getEditMenuChoice() {
         return Input.getIntInput(
                 """
+                ===================
                 1. Edit Name
                 2. Edit Priority
                 3. Delete Tier
                 4. Back                                 
+                ===================
+                Input: \
                 """, 1, 4);
     }
 
     public void nameUpdated() {
-        System.out.println("Name has been updated");
+        System.out.println(
+                """
+                =====================
+                Name has been updated
+                =====================
+                """);
     }
 
     public void priorityUpdated() {
-        System.out.println("Priority has been updated");
+        System.out.println(
+                """
+                =========================
+                Priority has been updated
+                =========================
+                """);
     }
 
     public boolean confirmDelete() {
@@ -93,11 +115,21 @@ public class TierBoundary {
     }
 
     public void tierDeleted() {
-        System.out.println("Tier has been deleted");
+        System.out.println(
+                """
+                ======================
+                Tier has been deleted
+                ======================
+                """);
     }
 
     public void cannotDeleteDefaultTier() {
-        System.out.println("Default tier cannot be deleted");
+        System.out.println(
+                """
+                ==============================
+                Default tier cannot be deleted
+                ==============================
+                """);
     }
 
     public LocalDate getStartDate() {
@@ -149,13 +181,13 @@ public class TierBoundary {
         float averageDaysReservation = 0;
         
         for (TierControl.ReportTier reportTier: reportTiers) {            
-            System.out.println("%-10s|%8d|%17d|%19d|%21.02f|%28.02f".formatted(
+            System.out.println("%-10s|%8d|%17d|%19d|%s|%s".formatted(
                     Util.ellipsis(reportTier.tier().getName(), 10), 
                     reportTier.tier().getPriority(), 
                     reportTier.reservationCount(), 
                     reportTier.totalReservationDays(), 
-                    reportTier.averageDaysRoom(), 
-                    reportTier.averageDaysReservation()
+                (reportTier.averageDaysRoom() == 0)? "%21s".formatted("-"): "%21.02f".formatted(reportTier.averageDaysRoom()),
+                (reportTier.averageDaysReservation() == 0)? "%28s".formatted("-"): "%28.02f".formatted(reportTier.averageDaysReservation())
             ));
             
             reservationCount += reportTier.reservationCount();
@@ -166,18 +198,19 @@ public class TierBoundary {
         
         System.out.println("-".repeat(107));
         
-        System.out.println("%-19s|%17d|%19d|%21.02f|%28.02f".formatted(
+        System.out.println("%-19s|%17d|%19d|%s|%s".formatted(
             "Total",
             reservationCount,
             totalReservationDays,
-            averageDaysRoom,
-            averageDaysReservation
+           (averageDaysRoom == 0)? "%21s".formatted("-"): "%21.02f".formatted(averageDaysRoom),
+           (averageDaysReservation == 0)? "%28s".formatted("-"): "%28.02f".formatted(averageDaysReservation)
         ));
             }
 
     public int getReportOption() {
         return Input.getIntInput(
                 """
+                =========================================
                 1. Sort by name              
                 2. Sort by priority              
                 3. Sort by reservation count                     
@@ -185,12 +218,17 @@ public class TierBoundary {
                 5. Sort by average days per room         
                 6. Sort by average days per reservation 
                 7. Back
-                
+                =========================================
                 Input: \
                 """, 1, 7);
     }
 
     public void invalidDateRange() {
-        System.out.println("Start date cannot be after end date");
+        System.out.println(
+                """
+                ===================================
+                Start date cannot be after end date
+                ===================================
+                """);
     }
 }

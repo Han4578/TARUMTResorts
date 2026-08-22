@@ -15,7 +15,6 @@ import java.util.Objects;
  * @author Liew Zheng Han
  */
 public class Account implements Comparable<Account>, Serializable {
-    static protected long lastAccountId = 1;
     protected long accountId;
     protected String name = "";
     protected String email;
@@ -23,13 +22,19 @@ public class Account implements Comparable<Account>, Serializable {
     
     public Account(String email) {
         this.email = email.toLowerCase();
-        this.accountId = Account.lastAccountId++;
     }
     
     public Account(String email, String password) {
         this.email = email.toLowerCase();
         this.password = Account.hashPassword(password);
-        this.accountId = Account.lastAccountId++;
+    }
+    
+    public void setAccountId(long accountId) {
+        this.accountId = accountId;
+    }
+    
+    public long getAccountId() {
+        return this.accountId;
     }
     
     public String getName() {

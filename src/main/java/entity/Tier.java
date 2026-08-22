@@ -11,13 +11,11 @@ import java.io.Serializable;
  * @author Liew Zheng Han
  */
 public class Tier implements Serializable, Comparable<Tier> {
-    private static int latestTierId = 0;
     private int tierId;
     private String name;
     private int priority;
 
     public Tier(String name, int priority) {
-        this.tierId = Tier.latestTierId++;
         this.name = name;
         this.priority = priority;
     }
@@ -62,6 +60,4 @@ public class Tier implements Serializable, Comparable<Tier> {
         hash = 67 * hash + this.tierId;
         return hash;
     }
-    
-    
 }

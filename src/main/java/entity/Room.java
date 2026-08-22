@@ -45,6 +45,8 @@ public class Room implements Serializable, Comparable<Room> {
     
     public boolean canAssign(LocalDate startDate, LocalDate endDate) {
         int index = this.reservations.binarySearch(r -> !startDate.isAfter(r.getEndDate()));
+        
+        if (index >= this.reservations.size()) return true;
                 
         Reservation reservation2 = this.reservations.get(index);
 

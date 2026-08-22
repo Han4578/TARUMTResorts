@@ -60,9 +60,11 @@ public class BucketPriorityQueue<T> implements PriorityQueueInterface<T>, Serial
     @Override
     public T peek() {
         int lowestPriority = this.containsItem.nextSetBit(0);
+        if (lowestPriority == -1) return null;
+        
         Node nodeTail = this.buckets.get(lowestPriority);
         if (nodeTail == null) return null;
-        return nodeTail.getItem();
+        return nodeTail.getNext().getItem();
     }
 
     @Override
@@ -335,7 +337,7 @@ public class BucketPriorityQueue<T> implements PriorityQueueInterface<T>, Serial
         }
     }
     
-    private class Node {
+    private class Node implements Serializable {
         private Node next = null;
         private T item = null;
         long nodeId;

@@ -21,8 +21,9 @@ import java.io.Serializable;
 public class TierRepository implements Serializable {
     private final PriorityQueueInterface<Reservation> queue = new BucketPriorityQueue<>();
     private final SortedListInterface<Tier> tiers = new SortedArrayList<>();
-    private final Tier defaultTier = new Tier("Regular", 0);
+    private final Tier defaultTier = new Tier("Regular", 3);
     private final UserRepository userRepository;
+    private int lastTierId = 1;
     
     public TierRepository(UserRepository userRepository) {
         this.tiers.add(this.defaultTier);
@@ -41,14 +42,15 @@ public class TierRepository implements Serializable {
         int currentPriority = tier.getPriority();
         this.tiers.remove(tier);
         tier.setPriority(newPriority);
-        this.tiers.add(tier);
         if (shiftPriority) { // All tiers >= newPriority += 1
             this.queue.movePriority(currentPriority, newPriority, t -> t.getCustomer().getTier().equals(tier));
 
-            for (int i = this.tiers.binarySearch(tier); i < this.tiers.size(); ++i) {
-                this.tiers.get(i).setPriority(newPriority++);
+            for (int i = this.tiers.binarySearch(t -> newPriority <= t.getPriority()); i < this.tiers.size(); ++i) {
+                Tier t = this.tiers.get(i);
+                t.setPriority(t.getPriority() + 1);
             }
         } else this.queue.mergePriority(currentPriority, newPriority, t -> t.getCustomer().getTier().equals(tier));
+        this.tiers.add(tier);
     }
     
     public boolean tierOccupied(int priority) {
@@ -58,6 +60,7 @@ public class TierRepository implements Serializable {
     }
 
     public void addTier(Tier tier, boolean shiftOtherTierPriorities) {
+        tier.setTierId(this.lastTierId++);
         
         if (shiftOtherTierPriorities) {
             int insertPriority = (this.tiers.isEmpty())? 0: this.tiers.get(-1).getPriority() + 1;

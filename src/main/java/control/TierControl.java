@@ -6,11 +6,11 @@ package control;
 
 import adt.SortedListInterface;
 import boundary.TierBoundary;
+import dao.RoomRepository;
+import dao.TierRepository;
 import entity.Reservation;
 import entity.Room;
-import dao.RoomRepository;
 import entity.Tier;
-import dao.TierRepository;
 import java.time.LocalDate;
 import static java.time.temporal.ChronoUnit.DAYS;
 import tarumtresorts.TARUMTResorts;

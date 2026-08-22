@@ -24,6 +24,7 @@ public class RoomAssignBoundary {
     public int getMenuOption() {
         return Input.getIntInput(
                 """
+                =========================================
                 1. Manage Allocation Queue
                 2. Assign Next In Line
                 3. Assign Next Available
@@ -32,7 +33,7 @@ public class RoomAssignBoundary {
                 6. Generate Annual Report
                 7. View Room Availability
                 8. Back
-                
+                =========================================
                 Input: \
                 """, 1, 8);
     }
@@ -48,7 +49,7 @@ public class RoomAssignBoundary {
                 6. Select From List
                 7. Select Next Available
                 8. Back
-                
+                =========================================
                 Tnput: \
                 """, 1, 8);
     }
@@ -65,12 +66,14 @@ public class RoomAssignBoundary {
     }
     
     public void showRooms(ListInterface<Room> rooms) {
+        System.out.println("==================================");
         System.out.println("No. Room Number Status");
         
         for (int i = 0; i < rooms.size(); i++) {
             Room room = rooms.get(i);
             System.out.println("%-3s %-11d %s".formatted(i + 1, room.getRoomNumber(), room.getStatus()));
         }
+        System.out.println("==================================");
     }
     
     public int getAvailableRoomChoice(ListInterface<Room> rooms) {
@@ -92,6 +95,8 @@ public class RoomAssignBoundary {
                 "Tier",
                 "Priority"
         ));
+        
+        System.out.println("=".repeat(72));
     }
     
     public void showQueue(Reservation reservation, int numbering) {
@@ -108,15 +113,21 @@ public class RoomAssignBoundary {
         ));
     }
     
+    public void showQueueFooter() {
+        System.out.println("=".repeat(72));
+    }
+    
     public void showReservation(Reservation reservation) {
         DateTimeFormatter format = DateTimeFormatter.ofPattern("dd MMM yyyy");
         System.out.println(
                 """
+                ========================
                 Customer name: %s
                 Customer email: %s
                 Customer tier: %s
                 Start date: %s
                 End date: %s
+                ========================
                 """.formatted(
                 reservation.getCustomer().getName(), 
                 reservation.getCustomer().getEmail(), 
@@ -178,7 +189,12 @@ public class RoomAssignBoundary {
     }
 
     public void invalidDateRange() {
-        System.out.println("Start date cannot be after end date");
+        System.out.println(
+                """
+                ====================================
+                Start date cannot be after end date
+                ====================================
+                """);
     }
     
     public boolean confirmRemoveQueue() {
@@ -186,7 +202,12 @@ public class RoomAssignBoundary {
     }
     
     public void removeQueueSuccess() {
-        System.out.println("Reservation removed from queue");
+        System.out.println(
+                """
+                ===============================
+                Reservation removed from queue
+                ===============================
+                """);
     }
     
     public boolean confirmUnassignRoom() {
@@ -194,11 +215,21 @@ public class RoomAssignBoundary {
     }
     
     public void unassignRoomSuccess() {
-        System.out.println("Room has been unassigned");
+        System.out.println(
+                """
+                =========================
+                Room has been unassigned
+                =========================
+                """);
     }
 
     public void roomAssignSuccess() {
-        System.out.println("Room has been assigned");
+        System.out.println(
+                """
+                =========================
+                Room has been assigned
+                =========================
+                """);
     }
 
     public void noAvailableReservations() {
@@ -243,12 +274,12 @@ public class RoomAssignBoundary {
         float averageDaysReservation = 0;
         
         for (RoomAssignControl.ReportMonth reportMonth: reportMonths) {
-            System.out.println("%-5s|%17d|%19d|%21.02f|%28.02f".formatted(
+            System.out.println("%-5s|%17d|%19d|%s|%s".formatted(
                     reportMonth.month().getMonth().getDisplayName(TextStyle.SHORT, Locale.ENGLISH), 
                     reportMonth.reservationCount(), 
                     reportMonth.totalReservationDays(), 
-                    reportMonth.averageDaysRoom(), 
-                    reportMonth.averageDaysReservation()
+                (reportMonth.averageDaysRoom() == 0)? "%21s".formatted("-"): "%21.02f".formatted(reportMonth.averageDaysRoom()),
+                (reportMonth.averageDaysReservation() == 0)? "%28s".formatted("-"): "%28.02f".formatted(reportMonth.averageDaysReservation())
             ));
             
             reservationCount += reportMonth.reservationCount();
@@ -259,12 +290,12 @@ public class RoomAssignBoundary {
         
         System.out.println("-".repeat(94));
         
-        System.out.println("%-5s|%17d|%19d|%21.02f|%28.02f".formatted(
+        System.out.println("%-5s|%17d|%19d|%s|%s".formatted(
             "Total",
             reservationCount,
             totalReservationDays,
-            averageDaysRoom,
-            averageDaysReservation
+           (averageDaysRoom == 0)? "%21s".formatted("-"): "%21.02f".formatted(averageDaysRoom),
+           (averageDaysReservation == 0)? "%28s".formatted("-"): "%28.02f".formatted(averageDaysReservation)
         ));
         
     }
@@ -272,13 +303,14 @@ public class RoomAssignBoundary {
     public int getReportOption() {
         return Input.getIntInput(
                 """
+                =========================================
                 1. Sort by month                 
                 2. Sort by reservation count                     
                 3. Sort by reserved days
                 4. Sort by average days per room         
                 5. Sort by average days per reservation 
                 6. Back
-                
+                =========================================
                 Input: \
                 """, 1, 6);
     }

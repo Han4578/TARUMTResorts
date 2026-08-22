@@ -20,12 +20,14 @@ public class UserRepository implements Serializable {
     private final TableInterface<String, Account> userTable = new DoubleHashingTable<>();
     private final ListInterface<Account> deactivatedUsers = new ArrayList<>();
     private final Account adminAccount = new Account("admin@admin.com", "password");
+    private long latestAccountId = 0;
     
     public UserRepository() {
-        this.userTable.insert(this.adminAccount.getEmail(), this.adminAccount);
+        this.userTable.insert(this.adminAccount.getEmail(), this.adminAccount);        
     }
     
     public void addUser(Account account) {
+        account.setAccountId(latestAccountId++);
         this.userTable.insert(account.getEmail(), account);
     }
     

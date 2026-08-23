@@ -12,7 +12,7 @@ package adt;
 import java.io.Serializable;
 import java.math.BigInteger;
 
-public class DoubleHashingTable<K, V> implements TableInterface<K, V>, Serializable {
+public class HashedDictionary<K, V> implements DictionaryInterface<K, V>, Serializable {
     private Entry<K, V>[] table;
     private double loadFactor;
     private int size, threshold;
@@ -23,15 +23,15 @@ public class DoubleHashingTable<K, V> implements TableInterface<K, V>, Serializa
     private static int DEFAULT_SIZE = 7;
     private static final double DEFAULT_LOAD_FACTOR = 0.75;
     
-    public DoubleHashingTable() {
+    public HashedDictionary() {
         this(DEFAULT_SIZE, DEFAULT_LOAD_FACTOR);
     }
 
-    public DoubleHashingTable(int size) {
+    public HashedDictionary(int size) {
         this(size, DEFAULT_LOAD_FACTOR);
     }
     
-    public DoubleHashingTable(int size, double loadFactor) {
+    public HashedDictionary(int size, double loadFactor) {
         this.loadFactor = loadFactor;
         this.size = Math.max(DEFAULT_SIZE, size);
         adjustSize();

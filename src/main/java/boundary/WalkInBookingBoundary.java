@@ -73,7 +73,7 @@ public class WalkInBookingBoundary {
     public LocalDate getStartDate() {
         while (true) {
             try {
-                String date = Input.getStringInput("Enter end date (dd/mm/yyyy): ");
+                String date = Input.getStringInput("Enter start date (dd/mm/yyyy): ");
                 DateTimeFormatter format = DateTimeFormatter.ofPattern("d/M/yyyy");
                 return LocalDate.parse(date, format);
             } catch (DateTimeParseException e){}

@@ -5,9 +5,12 @@
 package control;
 
 import adt.ArrayList;
+import adt.DictionaryInterface;
+import adt.HashedDictionary;
 import adt.LinkedList;
 import adt.ListInterface;
 import boundary.WalkInBookingBoundary;
+import dao.ReservationRepository;
 import dao.RoomRepository;
 import dao.TierRepository;
 import dao.UserRepository;
@@ -17,7 +20,9 @@ import entity.Room;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import tarumtresorts.TARUMTResorts;
+import utility.Generate;
 import utility.Input;
+import utility.SaveFile;
 
 /**
  *
@@ -29,15 +34,19 @@ public class WalkInBookingControl {
     private final UserRepository userRepository;
     private final RoomRepository roomRepository;
     private final TierRepository tierRepository;
+    private final ReservationRepository reservationRepository;
     
     private final ListInterface<Reservation> walkInQueue = new LinkedList<>();
     
     private final WalkInBookingBoundary walkInBookingBoundary = new WalkInBookingBoundary();
     
-    public WalkInBookingControl(UserRepository userRepository, RoomRepository roomRepository, TierRepository tierRepository) {
+    private DictionaryInterface<String, Reservation> reservationTable = new HashedDictionary<>();
+    
+    public WalkInBookingControl(UserRepository userRepository, RoomRepository roomRepository, TierRepository tierRepository, ReservationRepository reservationRepository) {
         this.userRepository = userRepository;
         this.roomRepository = roomRepository;
         this.tierRepository = tierRepository;
+        this.reservationRepository = reservationRepository;
     }
     
     // for customer to crud reservation
@@ -144,16 +153,25 @@ public class WalkInBookingControl {
             }
         }
         
+        reservationTable = reservationRepository.getReservationTable();
+        
+        String confirmNo;
+        do{
+            confirmNo = Generate.generateConfirmationNumber();
+        } while (reservationTable.containsKey(confirmNo));
+        
         LocalDate startDate = this.walkInBookingBoundary.getStartDate();
         LocalDate endDate = startDate.plusDays(stayDays);
-        Reservation newReservation = new Reservation(customer, startDate, endDate);
+        
+        Reservation newReservation = new Reservation(confirmNo, customer, startDate, endDate);
         
         walkInQueue.add(newReservation);
+        reservationRepository.addToResersevationTable(newReservation.getConfirmNo(), newReservation);
+        SaveFile.saveConfirmNoToFile(newReservation);
         
         return customer.getName() + " has been added to the end of the walk-in line. Please wait for the staff to process your request.";
     }
     
-
     public String updateStayDays(String email, int newStayDays) {
         for (int i = 0; i < walkInQueue.size(); i++) {
             Reservation r = walkInQueue.get(i);
@@ -200,6 +218,8 @@ public class WalkInBookingControl {
                 Room room = availableRooms.get(choice - 1);
 
                 room.addReservation(reservation);
+                reservationRepository.addToRoomTable(reservation.getConfirmNo(), room);
+                
                 return "Success: Room " + room.getRoomNumber() +" assigned to " + reservation.getCustomer().getName();
             }
         }

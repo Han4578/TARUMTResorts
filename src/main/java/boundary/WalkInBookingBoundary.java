@@ -10,10 +10,11 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import utility.Input;
+
 /**
- *
- * @author louos
+ * @author Louis
  */
+
 public class WalkInBookingBoundary {
     public int getCustomerChoice() {
         return Input.getIntInput(

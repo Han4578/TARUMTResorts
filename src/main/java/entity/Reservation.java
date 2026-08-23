@@ -19,7 +19,7 @@ public class Reservation implements Serializable, Comparable<Reservation> {
     private LocalDate endDate;
     private boolean checkIn = false;
     
-    public Reservation(String confirmNo,Customer customer, LocalDate startDate, LocalDate endDate) {
+    public Reservation(String confirmNo, Customer customer, LocalDate startDate, LocalDate endDate) {
         this.confirmNo = confirmNo;
         this.customer = customer;
         this.startDate = startDate;

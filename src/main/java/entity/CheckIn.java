@@ -8,7 +8,7 @@ import java.io.Serializable;
 
 /**
  *
- * @author chao_
+ * @author Tan Kah Chao
  */
 public class CheckIn implements Serializable{
     

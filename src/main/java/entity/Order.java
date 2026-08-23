@@ -7,7 +7,7 @@ package entity;
 
 /**
  *
- * @author chao_
+ * @author Tan Kah Chao
  */
 
 import adt.SortedArrayList;

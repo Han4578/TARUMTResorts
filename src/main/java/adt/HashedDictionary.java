@@ -7,7 +7,7 @@ package adt;
 
 /**
  *
- * @author chao_
+ * @author Tan Kah Chao
  */
 import java.io.Serializable;
 import java.math.BigInteger;

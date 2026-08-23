@@ -17,7 +17,6 @@ import utility.Input;
 import utility.Util;
 
 /**
- *
  * @author Liew Zheng Han
  */
 public class RoomAssignBoundary {

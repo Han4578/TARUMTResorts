@@ -9,7 +9,7 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 /**
  *
- * @author louos
+ * @author Louis
  * @param <T>
  */
 public class LinkedList<T> implements ListInterface<T>, Serializable {

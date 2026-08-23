@@ -15,7 +15,7 @@ import adt.ListInterface;
 
 /**
  *
- * @author chao_
+ * @author Tan Kah Chao
  */
 public class ReservationRepository implements Serializable {
     private final DictionaryInterface<String, Room> roomTable = new HashedDictionary<>();

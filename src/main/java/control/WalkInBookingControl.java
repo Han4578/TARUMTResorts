@@ -26,7 +26,7 @@ import utility.SaveFile;
 
 /**
  *
- * @author louos
+ * @author Louis
  */
 
 
@@ -225,7 +225,7 @@ public class WalkInBookingControl {
         }
         
         tierRepository.getQueue().insert(reservation, reservation.getCustomer().getTier().getPriority());
-        return "Reservation for " + reservation.getCustomer().getEmail() + "has been moved to room allocation queue";
+        return "Reservation for " + reservation.getCustomer().getEmail() + " has been moved to room allocation queue";
     }
     
     public String generateWaitlistReport(int sortOption) {

@@ -6,7 +6,7 @@ package entity;
 
 /**
  *
- * @author chao_
+ * @author Tan Kah Chao
  */
 
 import java.time.temporal.ChronoUnit;

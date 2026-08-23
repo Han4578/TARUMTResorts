@@ -8,7 +8,7 @@ import java.util.Random;
 
 /**
  *
- * @author chao_
+ * @author Tan Kah Chao
  */
 public class Generate {
     

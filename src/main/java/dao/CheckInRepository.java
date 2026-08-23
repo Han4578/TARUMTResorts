@@ -6,7 +6,7 @@ package dao;
 
 /**
  *
- * @author chao_
+ * @author Tan Kah Chao
  */
 
 import adt.ArrayList;

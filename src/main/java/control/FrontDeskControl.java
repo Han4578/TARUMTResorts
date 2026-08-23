@@ -6,7 +6,7 @@ package control;
 
 /**
  *
- * @author chao_
+ * @author Tan Kah Chao
  */
 
 import adt.ArrayList;

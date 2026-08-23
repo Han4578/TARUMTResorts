@@ -5,19 +5,19 @@
 package dao;
 
 import adt.ArrayList;
-import adt.DoubleHashingTable;
+import adt.HashedDictionary;
 import adt.ListInterface;
-import adt.TableInterface;
 import entity.Account;
 import entity.Customer;
 import java.io.Serializable;
+import adt.DictionaryInterface;
 
 /**
  *
  * @author Liew Zheng Han
  */
 public class UserRepository implements Serializable {
-    private final TableInterface<String, Account> userTable = new DoubleHashingTable<>();
+    private final DictionaryInterface<String, Account> userTable = new HashedDictionary<>();
     private final ListInterface<Account> deactivatedUsers = new ArrayList<>();
     private final Account adminAccount = new Account("admin@admin.com", "password");
     private long latestAccountId = 0;
@@ -52,7 +52,7 @@ public class UserRepository implements Serializable {
         this.addUser(customer);
     }
     
-    public TableInterface<String, Account> getUsers() {
+    public DictionaryInterface<String, Account> getUsers() {
         return this.userTable;
     }
 }

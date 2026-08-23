@@ -9,6 +9,7 @@ import adt.ListInterface;
 import adt.PriorityQueueInterface;
 import adt.SortedListInterface;
 import boundary.RoomAssignBoundary;
+import dao.ReservationRepository;
 import dao.RoomRepository;
 import dao.TierRepository;
 import entity.Reservation;
@@ -27,10 +28,12 @@ public class RoomAssignControl {
     private final RoomAssignBoundary roomAssignBoundary = new RoomAssignBoundary();
     private final RoomRepository roomRepository;
     private final TierRepository tierRepository;
+    private final ReservationRepository reservationRepository;
     
-    public RoomAssignControl(RoomRepository roomRepository, TierRepository tierRepository) {
+    public RoomAssignControl(RoomRepository roomRepository, TierRepository tierRepository, ReservationRepository reservationRepository) {
         this.roomRepository = roomRepository;
         this.tierRepository = tierRepository;
+        this.reservationRepository = reservationRepository;
     }
     
     public void start() {
@@ -269,6 +272,8 @@ public class RoomAssignControl {
         
         if (!this.roomAssignBoundary.confirmUnassignRoom()) return;
         
+        reservationRepository.removeFromRoomTable(reservations.get(index).getConfirmNo());
+        
         reservations.remove(index);
         TARUMTResorts.save();
         this.roomAssignBoundary.unassignRoomSuccess();
@@ -320,6 +325,8 @@ public class RoomAssignControl {
         if (choice == 0) return false;
 
         availableRooms.get(choice - 1).addReservation(reservation);
+        
+        reservationRepository.addToRoomTable(reservation.getConfirmNo(), availableRooms.get(choice - 1));
         
         return true;
     }

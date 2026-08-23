@@ -4,13 +4,17 @@
 
 package tarumtresorts;
 
+import adt.DictionaryInterface;
 import control.CustomerControl;
+import control.FrontDeskControl;
 import control.HousekeepingTaskControl;
 import control.MainMenuControl;
 import control.RoomAssignControl;
 import control.StaffControl;
 import control.TierControl;
 import control.WalkInBookingControl;
+import dao.CheckInRepository;
+import dao.ReservationRepository;
 import dao.RoomRepository;
 import dao.TaskRepository;
 import dao.TierRepository;
@@ -24,6 +28,8 @@ import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.time.LocalDate;
+import utility.Generate;
+import utility.SaveFile;
 
 /**
  *
@@ -34,6 +40,8 @@ public class TARUMTResorts {
     private static TierRepository tierRepository;
     private static RoomRepository roomRepository;
     private static TaskRepository taskRepository;
+    private static ReservationRepository reservationRepository;
+    private static CheckInRepository checkInRepository;
     
     private static CustomerControl customerControl;
     private static StaffControl staffControl;
@@ -41,17 +49,17 @@ public class TARUMTResorts {
     private static RoomAssignControl roomAssignControl;
     private static HousekeepingTaskControl housekeepingTaskControl;
     private static WalkInBookingControl walkInBookingControl;
+    private static FrontDeskControl frontDeskControl;
     
     public static void main(String[] args) {
         TARUMTResorts.load();
-        
-        walkInBookingControl = new WalkInBookingControl(userRepository, roomRepository, tierRepository);
+        walkInBookingControl = new WalkInBookingControl(userRepository, roomRepository, tierRepository, reservationRepository);
         tierControl = new TierControl(tierRepository, roomRepository);
-        roomAssignControl = new RoomAssignControl(roomRepository, tierRepository);
+        roomAssignControl = new RoomAssignControl(roomRepository, tierRepository, reservationRepository);
         housekeepingTaskControl = new HousekeepingTaskControl(roomRepository, taskRepository);
-        
+        frontDeskControl = new FrontDeskControl(checkInRepository, reservationRepository, roomRepository);
         customerControl = new CustomerControl(userRepository, tierRepository, walkInBookingControl);
-        staffControl = new StaffControl(tierControl, roomAssignControl, housekeepingTaskControl, walkInBookingControl);
+        staffControl = new StaffControl(tierControl, roomAssignControl, housekeepingTaskControl, walkInBookingControl, frontDeskControl);
         
         new MainMenuControl(userRepository, tierRepository, customerControl, staffControl).start();
     }
@@ -62,13 +70,17 @@ public class TARUMTResorts {
             userRepository = (UserRepository) in.readObject();
             tierRepository = (TierRepository) in.readObject();
             roomRepository = (RoomRepository) in.readObject();
-            taskRepository = (TaskRepository) in.readObject();            
+            taskRepository = (TaskRepository) in.readObject();
+            reservationRepository = (ReservationRepository) in.readObject();
+            checkInRepository = (CheckInRepository) in.readObject(); 
+            
         } catch (Exception e) {
             userRepository = new UserRepository();
             tierRepository = new TierRepository(userRepository);
             roomRepository = new RoomRepository();
             taskRepository = new TaskRepository();
-            
+            reservationRepository = new ReservationRepository();
+            checkInRepository = new CheckInRepository();
             loadDummyData();
         }
     }
@@ -80,6 +92,8 @@ public class TARUMTResorts {
             out.writeObject(tierRepository);
             out.writeObject(roomRepository);
             out.writeObject(taskRepository);
+            out.writeObject(reservationRepository);
+            out.writeObject(checkInRepository);
             
         } catch (Exception e) {
             System.out.println(e);
@@ -87,6 +101,8 @@ public class TARUMTResorts {
     }
     
     private static void loadDummyData() {
+        SaveFile.clearDummyConfirmNoFile();
+        
         tierRepository.addTier(new Tier("Diamond", 0), false);
         tierRepository.addTier(new Tier("Silver", 1), false);
         
@@ -103,18 +119,39 @@ public class TARUMTResorts {
         bookedAll.setName("Alex");
         
         for (Room room: roomRepository.getRooms()) {
-            room.addReservation(new Reservation(bookedAll, date.minusDays(2), date));
+            Reservation reservation = createReservation(bookedAll, date.minusDays(2), date);
+            room.addReservation(reservation);
         }
         
         for (int i = 0; i < emails.length; i++) {
             Customer c = new Customer(emails[i], "123456", tierRepository.getDefaultTier());
             c.setName(names[i]);
             userRepository.addUser(c);
-            tierRepository.getQueue().insert(new Reservation(c, dates[i], dates[i].plusDays(2)), c.getTier().getPriority());
+            Reservation reservation = createReservation(c, dates[i], dates[i].plusDays(2));
+            tierRepository.getQueue().insert(reservation, c.getTier().getPriority());
         }
         
         Customer c = new Customer("new@new.com", "123456", tierRepository.getTiers().get(0));
         userRepository.addUser(c);
-        tierRepository.getQueue().insert(new Reservation(c, LocalDate.of(2022, 1, 1), LocalDate.of(2022, 2, 5)), c.getTier().getPriority());
+        Reservation reservation = createReservation(c, LocalDate.of(2022, 1, 1), LocalDate.of(2022, 2, 5));
+        tierRepository.getQueue().insert(reservation, c.getTier().getPriority());
+    }
+    
+    private static Reservation createReservation(Customer customer, LocalDate startDate, LocalDate endDate) {
+        DictionaryInterface<String, Reservation>reservationTable = reservationRepository.getReservationTable();
+
+        String confirmNo;
+
+        do {
+            confirmNo = Generate.generateConfirmationNumber();
+        } while (reservationTable.containsKey(confirmNo));
+
+        Reservation reservation = new Reservation(confirmNo, customer, startDate, endDate);
+
+        reservationRepository.addToResersevationTable(reservation.getConfirmNo(), reservation);
+
+        SaveFile.saveConfirmNoToDummyFile(reservation);
+
+        return reservation;
     }
 }

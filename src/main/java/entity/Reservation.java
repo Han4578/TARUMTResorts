@@ -7,19 +7,27 @@ package entity;
 import java.io.Serializable;
 import java.time.LocalDate;
 
+
 /**
  *
  * @author Liew Zheng Han
  */
 public class Reservation implements Serializable, Comparable<Reservation> {
+    private final String confirmNo;
     private Customer customer;
     private LocalDate startDate;
     private LocalDate endDate;
+    private boolean checkIn = false;
     
-    public Reservation(Customer customer, LocalDate startDate, LocalDate endDate) {
+    public Reservation(String confirmNo,Customer customer, LocalDate startDate, LocalDate endDate) {
+        this.confirmNo = confirmNo;
         this.customer = customer;
         this.startDate = startDate;
         this.endDate = endDate;
+    }
+
+    public String getConfirmNo() {
+        return confirmNo;
     }
     
     public Customer getCustomer() {
@@ -44,6 +52,14 @@ public class Reservation implements Serializable, Comparable<Reservation> {
     
     public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
+    }
+    
+    public boolean isCheckIn() {
+        return checkIn;
+    }
+
+    public void setCheckIn(boolean checkIn) {
+        this.checkIn = checkIn;
     }
 
     @Override

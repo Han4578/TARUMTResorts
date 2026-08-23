@@ -12,7 +12,7 @@ import java.io.Serializable;
  * @param <K>
  * @param <V>
  */
-public interface TableInterface<K, V> extends Serializable {
+public interface DictionaryInterface<K, V> extends Serializable {
     public V insert(K key, V value);
     public boolean containsKey(K key);
     public V get(K key);

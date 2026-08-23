@@ -65,4 +65,22 @@ public class Input {
             return reply.equals("y");
         }    
     }
+    
+    public static float getFloatInput(String message, float lowest, float highest) {        
+        while (true) {
+            System.out.print(message);
+            if (scanner.hasNextInt()) {
+                float input = scanner.nextFloat();
+                scanner.nextLine();
+                if (input < lowest || input > highest) {
+                    System.out.println("Invalid value.");
+                    continue;
+                }
+                return input;
+            } else {
+                System.out.println("Invalid input.");
+            }            
+            scanner.nextLine();
+        }
+    }
 }

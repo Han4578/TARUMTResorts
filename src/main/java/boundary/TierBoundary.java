@@ -110,7 +110,7 @@ public class TierBoundary {
     }
 
     public boolean confirmDelete() {
-        return Input.getBooleanInput("Are you sure you want to delete this tier? All appointments of this tier in queue will return to default priority [y/n]:");
+        return Input.getBooleanInput("Are you sure you want to delete this tier? All reservations of this tier in queue will return to default priority [y/n]:");
     }
 
     public void tierDeleted() {
